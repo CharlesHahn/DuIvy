@@ -44,7 +44,7 @@ def xvg_deal(filename):
 
 
 
-def multi_plot(data_lis, select, filename_lis):
+def multi_plot(data_lis, select, filename_lis, title, ylabel, showlegend):
 	number_list = []
 	for i in range(2, len(select)):
 		number_list.append(int( select[i] ))
@@ -53,18 +53,21 @@ def multi_plot(data_lis, select, filename_lis):
 		ax = plt.subplot(len(number_list), 1, i+1 )
 		ax_legend = []
 		for data in data_lis:
-			ax.plot( data[0][1:], data[ number_list[i] ][1:] ) 
+			ax.plot( [ d/1000 for d in data[0][1:] ], data[ number_list[i] ][1:] ) 
 			ax_legend.append( data[number_list[i]][0] )
 			# print( data[ number_list[i] ][0:10] )
 		for f in range(len(filename_lis)):
 			filename = filename_lis[f].split(".")[0]
 			ax_legend[f] += ' of ' + filename
+		if showlegend != 0:
+			ax_legend = showlegend
 		ax.legend(ax_legend)
-		plt.ylabel("energy (kJ/mol)") 
+		plt.ylabel(ylabel) 
 		if i == 0:
-			plt.title("multi energy comparison")
+			plt.title(title)
 
-	plt.xlabel("time (ps)")
+
+	plt.xlabel("time (ns)")
 	plt.show()
 
 
@@ -74,16 +77,27 @@ def main():
 	# energy_multi_show.py pro.xvg
 	cmds = [ i for i in sys.argv[1:] ]
 
+	print("energy_compare.py fileA, fileB, fileC, ... -n165, -ttitle_for_plot (optional) ")
+
 	data_lis = []
 	filename_lis = []
+	title = "Multi Energy Comparison"
+	ylabel = "energy (kJ/mol)"
+	showlegend = 0
 	for cmd in cmds:
-		if '-n' in cmd:
+		if '-n' == cmd[:2]:
 			column_select = cmd
+		elif '-t' == cmd[:2]:
+			title = cmd[2: ].replace('_', ' ')
+		elif '-y' == cmd[:2]:
+			ylabel = cmd[2:].replace('_', ' ')
+		elif '-l' == cmd[:2]:
+			showlegend = cmd[2:].split('_')
 		else:
 			data_lis.append( xvg_deal(cmd) )
 			filename_lis.append( cmd )
 	
-	multi_plot(data_lis, column_select, filename_lis)
+	multi_plot(data_lis, column_select, filename_lis, title, ylabel, showlegend)
 	print(" Over ~ ")
 
 
