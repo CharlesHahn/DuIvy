@@ -1,7 +1,7 @@
-## Environment
+## Sources
 
-Some scripts for using daily.
+Some scripts to deal the MD and Dock results files. 
 
-## DOCK and MD
+## DOCKandMD
 
-Some scripts for DOCK and MD results analysis.
+Some scripts to automate the DOCK and MD results analysis.
