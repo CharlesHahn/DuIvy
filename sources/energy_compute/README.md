@@ -21,3 +21,5 @@ python3 energy_compute.py prolig.xvg pro.xvg lig.xvg -foutput
 生成数据文件的各列名如下
 
 > LJ-SR  | Disper.corr. | Coulomb-SR | Coul.-recip. | ETOTAL | COULOMB
+
+生成的结果文件 energy_results_output 可以用xvgshow.py可视化
