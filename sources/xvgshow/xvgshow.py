@@ -82,27 +82,23 @@ def xvg_deal(filename):
     for i in range(column_num):
         data.append([])
     data[0].append('time')
-
+    title = "Null"
+    xlabel = "Null"
+    ylabel = "Null"
     for line in line_list:
         if line[0] == "@":
             if "title" in line:
                 title_line = line.strip('"')
                 if '"' in title_line:
                     title = title_line.split('"')[-1]
-                else:
-                    title = 'Null'
             elif "xaxis" in line:
                 xlabel_line = line.strip('"')
                 if '"' in xlabel_line:
                     xlabel = xlabel_line.split('"')[-1]
-                else:
-                    xlabel = 'Null'
             elif "yaxis" in line:
                 ylabel_line = line.strip('"')
                 if '"' in ylabel_line:
                     ylabel = ylabel_line.split('"')[-1]
-                else:
-                    ylabel = 'Null'
             elif "legend" in line and "@ s" in line:
                 legend = line.strip('"').split('"')[-1]
                 for i in range(1, column_num):
@@ -110,7 +106,7 @@ def xvg_deal(filename):
                         data[i].append(legend)
                         break
 
-        elif line[0] != '#' and line[0] != '@':
+        elif line[0] != '#' and line[0] != '@' and ('time' not in line):
             num_list = line.strip().split()
             for i in range(column_num):
                 if len(data[i]) == 0:
@@ -141,6 +137,7 @@ number by ',', like '-n2,3,5' (optional)")
         return
 
     filename = filename.strip()
+    title, xlabel, ylabel, data = xvg_deal(filename)
     try:
         title, xlabel, ylabel, data = xvg_deal(filename)
     except:
