@@ -1,4 +1,4 @@
-## energy_results.xvg generated from prolig_SR.xvg, pro_SR.xvg and lig_SR.xvg
+## energy_results_output.xvg generated from prolig_SR.xvg, pro_SR.xvg and lig_SR.xvg
  time  LJ (SR)  Disper. corr.  Coulomb (SR)  Coul. recip.  ETOTAL  COULOMB  
  0.0  -119.84387199999992  -2.215025999999998  -145.06326199999967  -68.57852000000094  -335.7006800000005  -213.6417820000006  
  10.0  -79.63930600000003  -2.209121999999999  -190.36376900000323  -38.49801000000025  -310.7102070000035  -228.86177900000348  

@@ -1,7 +1,7 @@
 #################################################
 # author : charlie
 # time : 20200712
-# command : python3 energy_compute.py prolig.xvg pro.xvg lig.xvg -foutput.xvg
+# command : python3 energy_compute.py prolig.xvg pro.xvg lig.xvg -foutput
 # usage :
 # 用于计算蛋白配体之间的相互作用，计算方法参考Jerkwin博客：
 #     https://jerkwin.github.io/2019/09/06/使用GROMACS计算分子间相互作用/
@@ -189,8 +189,8 @@ def energy_compute():
             for i in [ 3, 4 ]: 
                 final_data[-1][j] += final_data[i][j]
 
-        with open("energy_results" + filename_output + ".xvg", 'w') as fo:
-            fo.write("## energy_results" + filename_output + ".xvg generated from ")
+        with open("energy_results_" + filename_output + ".xvg", 'w') as fo:
+            fo.write("## energy_results_" + filename_output + ".xvg generated from ")
             fo.write(pro_lig_file + ', ' + pro_file + ' and ' + lig_file + '\n')
             for j in range(len(final_data[0])):
                 line_str = ' '

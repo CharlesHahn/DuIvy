@@ -1,7 +1,7 @@
 #### command
 
 ```shell
-python3 energy_compute.py prolig.xvg pro.xvg lig.xvg -foutput.xvg
+python3 energy_compute.py prolig.xvg pro.xvg lig.xvg -foutput
 ```
 
 #### usage
