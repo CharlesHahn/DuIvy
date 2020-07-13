@@ -63,7 +63,7 @@ def picture_subplot(title, xlabel, ylabel, data, cols):
         ylabel_use = ylabel_li
 
     plot_num = cols_num_gen(cols)
-    print(len(data[0]))
+    print("data length -> {}".format(len(data[0]) ))
     for i in cols:
         ax = plt.subplot(len(cols), 1, next(plot_num))
         ax.plot(data[0][1:], data[i][1:])
@@ -196,7 +196,10 @@ def energy_compute():
             for j in range(len(final_data[0])):
                 line_str = ' '
                 for i in range(len(final_data)):
-                    line_str += str(final_data[i][j]) + '  ' 
+                    if j == 0 : # title line
+                        line_str += "{:>16} ".format(final_data[i][j]) 
+                    if j > 0: # for data
+                        line_str += "{:>16.4f} ".format(final_data[i][j])
                 fo.write(line_str + '\n')
 
         cols = [ i for i in range(1, len(final_data))]
