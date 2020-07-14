@@ -122,15 +122,16 @@ def main():
     for i in column_show:
         table_first_line += "{: ^16}".format(data[i][0])
         # if original xvg file, add first line into compute
-        try:
-            float(data[i][0])
-        except:
-            start_index = 1
-            print("  ->> Unable to convert the raw 0 '{}' into float,".format(
-                data[i][0]), end = '')
-            print("start_index set to be 1")
-        else:
-            start_index = 0
+        if start_index == 0:
+            try:
+                float(data[i][0])
+            except:
+                start_index = 1
+                print("->> Unable to convert the raw 0 '{}' into float,".format(
+                    data[i][0]), end = '')
+                print("start_index set to be 1")
+            else:
+                start_index = 0
         table_seprate += "{:=^16}".format("=")
         table_line += "{:-^16}".format('-')
         table_title += "{:^16}".format(i)
