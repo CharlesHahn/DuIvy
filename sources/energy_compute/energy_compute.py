@@ -197,7 +197,8 @@ def energy_compute():
                 line_str = ' '
                 for i in range(len(final_data)):
                     if j == 0 : # title line
-                        line_str += "{:>16} ".format(final_data[i][j]) 
+                        line_str += "{:>16} ".format(
+                            final_data[i][j].replace(' ', '')) 
                     if j > 0: # for data
                         line_str += "{:>16.4f} ".format(final_data[i][j])
                 fo.write(line_str + '\n')
