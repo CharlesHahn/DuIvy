@@ -1,0 +1,10 @@
+- xvgformat 
+	- 用于对gromacs生成的xvg文件进行格式化，去掉很多不必要的字段，也可以转换为csv
+- energy_compute 
+	- 用于计算模拟体系中两种物质之间的相互作用
+- xvg_average
+	- 用于对xvg文件的指定部分求平均，可以输出各项参数在一定时间内的平均值
+- xvgshow
+	- 用于对xvg结果进行可视化，绘制各项参数随时间变化趋势
+- xvgcompare 
+	- 用于对不同的xvg文件及利用xvgformat之后的数据进行对比，并可视化展示
