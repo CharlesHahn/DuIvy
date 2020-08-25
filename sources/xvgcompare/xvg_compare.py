@@ -94,6 +94,7 @@ def multi_plot(data_lis, select, filename_lis, title, ylabel, xlabel, showlegend
             ax_legend[f] = str(ax_legend[f]) +  ' of ' + filename
         if showlegend != 0:
             ax_legend = showlegend
+        # print(ax_legend)
         ax.legend(ax_legend).get_frame().set_linewidth(0.0) #载入图例并设置无边框
         if len(ylabel_list) != len(number_list):
             plt.ylabel(ylabel) 
