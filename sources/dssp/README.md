@@ -4,8 +4,12 @@
 
 `xpm2gpl_CS.go` has one more type of secondary structure which is called `Chain_Seperator`.
 
+`xvg_xshrink.go` is used to shrink first columns (time usually) in given xvg file by any times.
+
 Both programs' source code were given in the go file.
 
 Type `xpm_xshrink1000.exe <filename>.xpm` to shrink x-axis.
 
-Type `xpm2gpl.exe -h` fo usage informations.
+Type `xpm2gpl.exe -h` for usage information.
+
+Type `xvg_xshrink.exe -h` for help info.
