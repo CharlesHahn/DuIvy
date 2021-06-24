@@ -1,7 +1,7 @@
 set term png
-set output "ss.png"
+set output "ss_gpl.png"
 unset colorbox
-set pal defined(0 "#BBBBBB",1 "#FF0000",2 "#000000",3 "#008000",4 "#FFFF00",5 "#0000FF",6 "#808080")
+set pal defined(0 "#FFFFFF",1 "#FF0000",2 "#000000",3 "#008000",4 "#FFFF00",5 "#0000FF",6 "#808080")
 
 $data <<EOD
 0 1 0
@@ -17665,7 +17665,7 @@ EOD
 #set bmargin at screen 0.20
 #set rmargin at screen 0.85
 #set label " 3-Helix " at screen 0.85,0.92 left textcolor rgb "#808080"
-#set label " Coil " at screen 0.85,0.82 left textcolor rgb "#BBBBBB"
+#set label " Coil " at screen 0.85,0.82 left textcolor rgb "#FFFFFF"
 #set label " B-Sheet " at screen 0.85,0.72 left textcolor rgb "#FF0000"
 #set label " B-Bridge " at screen 0.85,0.62 left textcolor rgb "#000000"
 #set label " Bend " at screen 0.85,0.52 left textcolor rgb "#008000"
@@ -17676,10 +17676,10 @@ set tics out nomirror;
 set key out reverse Left spacing 2 samplen 1/2
 set xl"Time (ps)"; set yl"Residue";
 plot [0:0.32] [1:535] $data u 1:2:3 w imag notit, \
+-1 w p ps 3 pt 5 lc rgb "#FF0000" t"B-Sheet", \
 -1 w p ps 3 pt 5 lc rgb "#000000" t"B-Bridge", \
 -1 w p ps 3 pt 5 lc rgb "#008000" t"Bend", \
 -1 w p ps 3 pt 5 lc rgb "#FFFF00" t"Turn", \
 -1 w p ps 3 pt 5 lc rgb "#0000FF" t"A-Helix", \
 -1 w p ps 3 pt 5 lc rgb "#808080" t"3-Helix", \
--1 w p ps 3 pt 5 lc rgb "#BBBBBB" t"Coil", \
--1 w p ps 3 pt 5 lc rgb "#FF0000" t"B-Sheet"
+-1 w p ps 3 pt 5 lc rgb "#FFFFFF" t"Coil"

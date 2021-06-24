@@ -2,6 +2,8 @@
 
 `xpm2gpl.exe` is designed to comvert xpm file to gpl file which can be plotted to png file by gnuplot. This program is inspired by Jerkwin's xpm2all.bsh scripts. Great appreciation to him.
 
+`xpm2gpl_CS.go` has one more type of secondary structure which is called `Chain_Seperator`.
+
 Both programs' source code were given in the go file.
 
 Type `xpm_xshrink1000.exe <filename>.xpm` to shrink x-axis.
