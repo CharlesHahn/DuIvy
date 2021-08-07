@@ -112,7 +112,7 @@ def parse_show(inputfile, show, outputfile, ip):
         print("ERROR -> length of char2note is not equal to xpm_color_num, check it !")
         exit()
     if len(xpm_data) != xpm_height:
-        print("ERROR -> raws of data is not equal to xpm height, check is !")
+        print("ERROR -> raws of data is not equal to xpm height, check it !")
         exit()
     for i in range(len(xpm_data)):
         if len(xpm_data[i]) != xpm_width*xpm_char_per_pixel:
@@ -267,8 +267,15 @@ def main():
     if len(cmd_list) == 0:
         print(Usage)
         exit()
-    if len(cmd_list)%2 != 0:
+    if len(cmd_list)%2 != 0 and len(cmd_list) > 1:
         print("ERROR -> wrong command, missing arguments")
+        print(Usage)
+        exit()
+    if len(cmd_list)%2 != 0 and len(cmd_list) == 1 and cmd_list[0] != "-h":
+        print("ERROR -> wrong command, missing arguments")
+        print(Usage)
+        exit()
+    if len(cmd_list)%2 != 0 and len(cmd_list) == 1 and cmd_list[0] == "-h":
         print(Usage)
         exit()
     for cmd in cmd_list:
