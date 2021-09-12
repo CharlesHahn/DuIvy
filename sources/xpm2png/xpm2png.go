@@ -118,11 +118,18 @@ func parse_save(inputfile, outputfile string) {
 			}
 		}
 		if len(items) == 7 && items[1] == "c" {
-			char2color[strings.Trim(items[0], "\"")] = items[2]
-			char2note[strings.Trim(items[0], "\"")] = strings.Trim(items[5], "\"")
+			if items[0] == "\"" {
+				char2color[" "] = items[2]
+				char2note[" "] = strings.Trim(items[5], "\"")
+			} else {
+				char2color[strings.Trim(items[0], "\"")] = items[2]
+				char2note[strings.Trim(items[0], "\"")] = strings.Trim(items[5], "\"")
+			}
 		}
-		if len(items) == 1 {
-			xpm_data = append(xpm_data, strings.Trim(strings.Trim(strings.TrimSpace(line), ", "), "\""))
+
+		data_line := strings.Trim(strings.Trim(strings.TrimSpace(line), ", "), "\"")
+		if len(data_line) == int(xpm_width*xpm_char_per_pixel) {
+			xpm_data = append(xpm_data, data_line)
 		}
 	}
 
