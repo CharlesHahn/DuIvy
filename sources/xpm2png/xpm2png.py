@@ -65,9 +65,13 @@ def parse_show(inputfile, show, outputfile, ip):
 
         items = line.strip().split()
         if len(items) == 7 and items[1] == "c":
-            char2color[items[0].strip("\"")] = items[2]
-            char2note[items[0].strip("\"")] = items[5].strip("\"")
-        if len(items) == 1:
+            if len(items[0].strip("\"")) == xpm_char_per_pixel:
+                char2color[items[0].strip("\"")] = items[2]
+                char2note[items[0].strip("\"")] = items[5].strip("\"")
+            if items[0].strip() == '"':
+                char2color[" "] = items[2]
+                char2note[" "] = items[5].strip("\"")
+        if line.strip().startswith('"') and len(line.strip().strip(",").strip("\"")) == xpm_width*xpm_char_per_pixel :
             xpm_data.append(line.strip().strip(",").strip("\""))
 
     ## data check and transformation
