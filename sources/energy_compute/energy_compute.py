@@ -13,7 +13,7 @@
 ### LJ-SR  | Disper.corr. | Coulomb-SR | Coul.-recip.
 # 
 # 生成数据文件的各列名如下
-### LJ-SR  | Disper.corr. | Coulomb-SR | Coul.-recip. | ETOTAL | COULOMB
+### LJ-SR  | Disper.corr. | Coulomb-SR | Coul.-recip. | ETOTAL | COULOMB | LJ_total
 # 结果文件 energy_results_output.xvg 可以用 xvgshow.py 可视化
 #################################################
 
@@ -133,7 +133,7 @@ def energy_compute():
         pro_file = sys.argv[2]
         lig_file = sys.argv[3]
     except:
-        print("No input filename! ")
+        print("No input filename! \n prolig pro lig")
         return 
     else:
         filename_output = ""
@@ -188,6 +188,13 @@ def energy_compute():
         final_data[-1][0] = "COULOMB"
         for j in range(1, len(final_data[0])):
             for i in [ 3, 4 ]: 
+                final_data[-1][j] += final_data[i][j]
+
+        # LJ_total
+        final_data.append([0 for x in range(len(final_data[0]))])
+        final_data[-1][0] = "LJ_total"
+        for j in range(1, len(final_data[0])):
+            for i in [ 1, 2 ]: 
                 final_data[-1][j] += final_data[i][j]
 
         with open("energy_results_" + filename_output + ".xvg", 'w') as fo:
