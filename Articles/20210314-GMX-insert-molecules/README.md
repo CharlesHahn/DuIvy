@@ -14,7 +14,7 @@
 
 `-box`设置盒子的大小。
 
-![1](C:\Users\hhhhh\Desktop\databank\公众号\20210314\1.png)
+![1](1.png)
 
 可以看到某些分子的部分原子会超出盒子范围，可以先预先把盒子调小一点，之后再`editconf`把盒子稍微扩大。
 
@@ -22,7 +22,7 @@
 >
 > gmx solvate -cp box.gro -cs spc216.gro -o solv.gro
 
-![2](C:\Users\hhhhh\Desktop\databank\公众号\20210314\2.png)
+![2](2.png)
 
 体系搭好之后记得编写topol.top把配体的拓扑文件加进去哦。
 
@@ -34,7 +34,7 @@
 
 > gmx insert-molecules -f complex.gro -ci lig.pdb -nmol 15 -o out.gro 
 
-![3](C:\Users\hhhhh\Desktop\databank\公众号\20210314\3.png)
+![3](3.png)
 
 成了（可能需要按需求微调下盒子大小）。之后就可以加溶剂，编写topol.top然后愉快模拟。
 

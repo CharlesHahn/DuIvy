@@ -4,11 +4,11 @@
 
 蛋白质的二级结构，最典型的应当就是α螺旋和β折叠了。通常一个蛋白质当中，α螺旋和β折叠以及loop都是很重要的组成部分。
 
-![blueFlamingo_logo](C:\Users\hhhhh\Desktop\databank\公众号\20210611\blueFlamingo_logo.png)
+![blueFlamingo_logo](blueFlamingo_logo.png)
 
 如上图的典型的α螺旋，一圈包含3.6个氨基酸，每两个氨基酸之间的高度差通常是1.5埃。当然在实际的情况下，这些数值也不是固定的。α螺旋通过上面一圈的氨基酸与下面一圈氨基酸之间的氢键来稳定其结构，氢键的走向和轴向一致。
 
-![WeChat Screenshot_20210612094418](C:\Users\hhhhh\Desktop\databank\公众号\20210611\WeChat Screenshot_20210612094418.png)
+![WeChat Screenshot_20210612094418](WeChat Screenshot_20210612094418.png)
 
 上图则显示了经典的antiparallel和parallel的β折叠。β折叠则是通过链与链之间的氢键来稳定的。
 
@@ -28,27 +28,27 @@ windows上可以源码编译，有兴趣有能力的朋友可以探索探索！
 
 在拿到DSSP的可执行程序之后，将程序添加到环境变量即可正常使用了（新建DSSP变量指向dssp.exe程序，也可以同时添加dssp.exe所在的路径到path变量），gmx应该也能正常调用。
 
-![WeChat Image_20210612162523](C:\Users\hhhhh\Desktop\databank\公众号\20210611\WeChat Image_20210612162523.png)
+![WeChat Image_20210612162523](WeChat Image_20210612162523.png)
 
 如果dssp没有正确安装或者没有添加到环境变量，`do_dssp`就无法找到这个程序，会出现如下的fatal error ：
 
-![WeChat Photo Editor_20210612145849](C:\Users\hhhhh\Desktop\databank\公众号\20210611\WeChat Photo Editor_20210612145849.jpg)
+![WeChat Photo Editor_20210612145849](WeChat Photo Editor_20210612145849.jpg)
 
 **NOTICE** ：DSSP4.0+的版本使用的命令较之前的版本有所改变。如果你使用的不是最新的GROMACS，那`do_dssp`程序可能无法正确调用DSSP4.0+，请使用较老的DSSP版本。
 
 这是最新的DSSP4.0+版本：
 
-![WeChat Photo Editor_20210612151534](C:\Users\hhhhh\Desktop\databank\公众号\20210611\WeChat Photo Editor_20210612151534.jpg)
+![WeChat Photo Editor_20210612151534](WeChat Photo Editor_20210612151534.jpg)
 
 这是较老的DSSP3.0.0的版本：
 
-![WeChat Photo Editor_20210612151339](C:\Users\hhhhh\Desktop\databank\公众号\20210611\WeChat Photo Editor_20210612151339.jpg)
+![WeChat Photo Editor_20210612151339](WeChat Photo Editor_20210612151339.jpg)
 
 ### 在Linux上安装DSSP
 
 做生物信息或者分子模拟相关工作的朋友相信或多或少可能接触过Linux操作系统，在Linux上安装DSSP对于有Linux使用经验的朋友来说应当是不难的。可以通过源码编译DSSP也可以直接安装二进制程序。诸多做生信或者模拟的朋友使用的Linux可能都是centos或者红帽，又或者Ubuntu或者Debian之流。我可能比较另类，爱好ArchLinux。ArchLinux的AUR仓库中是有dssp3.1.4的。
 
-![WeChat Screenshot_20210612110614](C:\Users\hhhhh\Desktop\databank\公众号\20210611\WeChat Screenshot_20210612110614.png)
+![WeChat Screenshot_20210612110614](WeChat Screenshot_20210612110614.png)
 
 故而可以通过下面的一行命令快速安装DSSP。
 
@@ -205,7 +205,7 @@ set key bottom outside horizontal center
 
 其它的部分我想应该都容易看懂，微调调就会比较不错啦。
 
-![ss](D:\TAU\Tau\report\gmxtools\ss.png)
+![ss](ss.png)
 
 ## 二级结构含量数据文件的绘图
 
@@ -213,7 +213,7 @@ set key bottom outside horizontal center
 
 通常得到的二级结构含量文件如下所示：
 
-![WeChat Image_20210612200052](C:\Users\hhhhh\Desktop\databank\公众号\20210611\WeChat Image_20210612200052.png)
+![WeChat Image_20210612200052](WeChat Image_20210612200052.png)
 
 在数据部分有诸多列，每一列表示不同的含义。最左边一列表示Time(ps)，紧接着的列分别表示Structure、Coil、B-Sheet、B-Bridge、Bend、Turn、3-Helix、Chain-Separator。当然不同的蛋白得到的这个文件可能不同，看看数据前面的说明就知道每一列表示什么意思了。
 
@@ -251,7 +251,7 @@ plot [0:40000] [-0.5:100] 'test_sc.xvg' \
 
 还有一个地方需要注意，`*100/739`，739表示的是蛋白质的总氨基酸数目。这里也需要根据你的蛋白质进行修改。
 
-![dsspsc](D:\TAU\210527\single\dsspsc.png)
+![dsspsc](dsspsc.png)
 
 可以自己调调每一个堆积的颜色，我这方面不擅长，也就这样凑合了。
 

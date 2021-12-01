@@ -6,11 +6,11 @@
 
 范德华力，我们通常认为它包括了分子之间的色散力、诱导力和Pauli交换互斥力等。范德华力最初是从实验中归纳出来的，定义颇为模糊。GMX中使用Lennard-Jones potential（LJ）来描述分子间的范德华力。LJ只包含了**色散力**和**Pauli互斥力**两部分，诱导力通常是非常弱的。在不存在强极性物质的情况下，LJ已经足以描述体系了。
 
-![LJ_graph](C:\Users\hhhhh\Desktop\databank\公众号\20211121\LJ_graph.png)
+![LJ_graph](LJ_graph.png)
 
 Fig 1. LJ衰减很快（GMX手册）
 
-![LJ](C:\Users\hhhhh\Desktop\databank\公众号\20211121\LJ.png)
+![LJ](LJ.png)
 
 Fig 2. LJ的计算公式（GMX手册）
 

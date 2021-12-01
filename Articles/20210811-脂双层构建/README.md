@@ -60,9 +60,11 @@ gmx editconf -f dppc.pdb -o dppc_box.gro -d 0.0 -rotate 0 0 -90
 
 最后得到的dppc_box.gro显示出来就是下图的样子：
 
-![3](C:\Users\hhhhh\Desktop\databank\公众号\20210811\3.png)
+![3](3.png)
 
 在命令执行完的回显里面，或者dppc_box.gro的最后一行，有记录这个小盒子的尺寸：0.7140  3.0696 0.5463 。
+
+**补充修正: 根据相关文献，单个磷脂在膜中的面积约为62平方埃。本文中使用的dppc小盒子的尺寸太小了，也即本文中的堆积方式过于密集，会造成预平衡过程中体系的异常膨胀。可以通过更改dppc_box.gro的尺寸，例如将x和z改为0.8，然后再平铺堆积即可。这样平铺得到的膜更接近“自然”状态，但dppc的分子间间隙较大，需要在预平衡初期进行上下两端的水的位置限制，防止水进入膜内，一段时间的弛豫之后再放开限制平衡一会儿即可。**
 
 #### 3. 脂单层的构建
 
@@ -76,7 +78,7 @@ gmx genconf -f dppc_box.gro -nbox 11 1 15 -o mem_up.gro
 
 铺完之后的box_up.gro显示出来是这样子的：
 
-![4](C:\Users\hhhhh\Desktop\databank\公众号\20210811\4.png)
+![4](4.png)
 
 看起来还是不错吧，仔细检查之后也没发现有不同分子之间的原子重合。这个脂单层盒子的尺寸是 7.854 3.0696 8.1945。
 
@@ -88,7 +90,7 @@ gmx editconf -f mem_up.gro -o mem_down.gro -d 0.0 -rotate 0 0 180
 
 这里是以Z方向上的法向为轴进行逆时针180度的旋转，当然你也可以以其它两个方向上的法向为轴进行旋转。
 
-![5](C:\Users\hhhhh\Desktop\databank\公众号\20210811\5.png)
+![5](5.png)
 
 
 
@@ -109,11 +111,11 @@ gmx editconf -f mem_down.gro -o box_down.gro -box 7.9 9.0 8.2 -center 3.95 3.00 
 
 上层脂单层的大盒子：
 
-![6](C:\Users\hhhhh\Desktop\databank\公众号\20210811\6.png)
+![6](6.png)
 
 下层脂单层的大盒子：
 
-![7](C:\Users\hhhhh\Desktop\databank\公众号\20210811\7.png)
+![7](7.png)
 
 之后，咱们把这两个大盒子合二为一：
 
@@ -123,7 +125,7 @@ gmx solvate -cp box_up.gro -cs box_down.gro -o box.gro
 
 `solvate`这个命令相信大家都用过的。`-cp`是待溶剂化的分子（p指代protein），`-cs`指溶剂化的体系（s指代solvent）。这里的意思就是用box_down.gro去溶剂化box_up.gro。需要注意的是，如果溶剂化的体系与待溶剂化的体系有位置冲突，则溶剂化体系中有冲突的分子会被删掉。
 
-![8](C:\Users\hhhhh\Desktop\databank\公众号\20210811\8.png)
+![8](8.png)
 
 做完这一步之后就得到脂双层了，看起来规规矩矩很合强迫症的喜好，但同时也可能意味着这个脂双层的熵太低了，并不“自然”，因为还需要一些弛豫的时间，来让它变得自然和可靠。
 
@@ -165,7 +167,7 @@ gmx solvate -cs water_box.gro -cp box.gro -o true_box.gro
 
 最后得到的体系：
 
-![9](C:\Users\hhhhh\Desktop\databank\公众号\20210811\9.png)
+![9](9.png)
 
 脂双层的上下两端被填充了水，不错吧！
 

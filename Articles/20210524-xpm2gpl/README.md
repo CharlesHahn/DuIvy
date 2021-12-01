@@ -18,7 +18,7 @@
 
 xpm2all.bsh把xpm文件转换成gpl脚本这个功能还可以设置配色，输出的形式，甚至还可以直接在图上画出简单的二级结构。第一次见到的时候真的觉得非常的惊艳！
 
-![xpm2all-fancy](C:\Users\hhhhh\Desktop\databank\公众号\20210524\xpm2all-fancy.png)
+![xpm2all-fancy](xpm2all-fancy.png)
 
 从老师的博文中扒了一张图来和大家一起感受下(https://jerkwin.github.io/2021/03/30/xpm2all更新-二级结构绘制_颜色方案)，非常漂亮，只可惜只能适用于较小采样量的情况。除此之外，xpm2all.bsh还可以设置要绘图的氨基酸范围等，也提供了转换xpm文件配色等多种功能。
 
@@ -26,7 +26,7 @@ xpm2all.bsh把xpm文件转换成gpl脚本这个功能还可以设置配色，输
 
 五一的时候我学了点儿Golang，就重写了老师这个脚本里面xpm2gpl部分的功能，当然没有fancy的那种了，只有最朴素的二级结构含量图的功能，不过倒是除了`-gpl`部分的五种配色，还加上了`-rgb`部分的20种配色，不过总的来讲，大部分的配色还是都不是特别好看。
 
-![ss](C:\Users\hhhhh\Desktop\databank\公众号\20210524\ss.png)
+![ss](ss.png)
 
 大概出来的图像这样吧，功能没老师的多，但是好在golang很方便编译成二进制文件，故而我也编译了windows可用的exe提供给大家。可以在github上下载（https://github.com/CharlesHahn/Scripts-for-DOCK-and-MD/tree/master/sources/dssp）。
 
