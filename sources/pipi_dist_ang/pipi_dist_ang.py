@@ -200,7 +200,8 @@ def main():
     if len(time) != len(distance) or len(time) != len(angles):
         print("Error -> length of time, dist, ang are not equal")
         print(len(time), len(distance), len(angles))
-    out_content = "{:<10} {:>10} {:>10} \n".format("time", "distance", "angle")
+    out_content = "{:<10} {:>10} {:>10} \n".format(
+            "time", "distance(nm)", "angle")
     out_content += "\n".join(["{:<10.0f} {:>10.3f} {:>10.3f} ".format(
         time[i], distance[i], angles[i] ) for i in range(len(distance))])
     with open(output_file, 'w') as fo:
