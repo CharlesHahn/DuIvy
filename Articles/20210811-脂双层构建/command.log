@@ -1,0 +1,30 @@
+gmx editconf -f dppc.pdb -o dppc_box.gro -d 0.0 -rotate 0 0 -90
+# size 0.7140 3.0696 0.5463
+gmx genconf -f dppc_box.gro -nbox 11 1 15  -o mem_up.gro  
+gmx editconf -f mem_up.gro -o mem_down.gro -d 0.0 -rotate 0 0 180
+
+gmx editconf -f mem_up.gro -o box_up.gro -box 7.9 9.0 8.2 -center 3.95 5.00  4.10
+gmx editconf -f mem_down.gro -o box_down.gro -box 7.9 9.0 8.2 -center 3.95 2.00 4.10
+gmx solvate -cs box_down.gro -cp box_up.gro -o box.gro
+
+gmx solvate -cs spc216.gro -o water_up.gro -box 7.9 2.4 8.2
+gmx solvate -cs spc216.gro -o water_down.gro -box 7.9 2.4 8.2
+gmx editconf -f water_up.gro -o water_box_up.gro -box 7.9 9.0 8.2 -center 3.95 7.8 4.1
+gmx editconf -f water_down.gro -o water_box_down.gro -box 7.9 9.0 8.2 -center 3.95 1.2 4.1
+gmx solvate -cs water_box_up.gro -cp water_box_down.gro -o water_box.gro 
+gmx solvate -cs water_box.gro -cp box.gro -o true_box.gro 
+
+## gmx solvate -cp box.gro -cs spc216.gro -p topol.top -o solvate.gro   
+
+gmx grompp -f em_real.mdp -c ions.gro -r ions.gro -p topol.top -o em_real.tpr -maxwarn 1  
+gmx mdrun -v -deffnm em_real  
+gmx make_ndx -f em_real.gro -o index.ndx
+gmx grompp -f nvt.mdp -c em_real.gro -r em_real.gro -p topol.top -o nvt.tpr -maxwarn 1
+gmx mdrun -deffnm nvt
+gmx grompp -f npt.mdp -c nvt.gro -r nvt.gro -p topol.top -t nvt.cpt -o npt.tpr -maxwarn 1
+gmx mdrun -deffnm npt
+
+gmx grompp -f martini_pre.mdp -c em_real.gro -r em_real.gro -p topol.top -o pre.tpr -maxwarn 1  -n index.ndx
+gmx mdrun -deffnm pre  
+
+gmx mdrun -s pre.tpr -cpi pre.cpt -deffnm pre -append
