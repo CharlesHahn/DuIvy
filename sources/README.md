@@ -1,3 +1,5 @@
+## Description
+
 - xvgformat 
   - 用于对gromacs生成的xvg文件进行格式化，去掉很多不必要的字段，也可以转换为csv
 - energy_compute 
@@ -16,3 +18,6 @@
   - 一些乱七八糟的脚本
 - pipi_dist_ang
   - 计算两个平面环（苯环）之间的几何中心距离和平面夹角
+
+---
+本Sources目录下，所有代码、数据等皆按照<祝你好运>协议开源。
