@@ -7,38 +7,52 @@ import argparse
 
 
 def calcDist(ring_1_frames, ring_2_frames):
+    """calculate the distance between the center of two ring"""
+
     ## check the frames of two ring
     if len(ring_1_frames) != len(ring_2_frames):
         print("Error -> length of frames of coordinates isn't equal")
         exit()
+
     ## calculate the distance between two ring
     distance = []
     for i in range(len(ring_1_frames)):
         ring_1_coor = ring_1_frames[i]
         ring_2_coor = ring_2_frames[i]
-        ring_1_atom_num = len(ring_1_coor)*1.0
-        ring_2_atom_num = len(ring_2_coor)*1.0
+        ring_1_atom_num = len(ring_1_coor) * 1.0
+        ring_2_atom_num = len(ring_2_coor) * 1.0
+
         ## calculate the center of two ring
-        ring_1_center = [ sum([coor[0] for coor in ring_1_coor]) / ring_1_atom_num, 
-                sum([coor[1] for coor in ring_1_coor ]) / ring_1_atom_num,
-                sum([coor[2] for coor in ring_1_coor ]) / ring_1_atom_num ]
-        ring_2_center = [ sum([coor[0] for coor in ring_2_coor]) / ring_2_atom_num, 
-                sum([coor[1] for coor in ring_2_coor ]) / ring_2_atom_num,
-                sum([coor[2] for coor in ring_2_coor ]) / ring_2_atom_num ]
+        ring_1_center = [
+            sum([coor[0] for coor in ring_1_coor]) / ring_1_atom_num,
+            sum([coor[1] for coor in ring_1_coor]) / ring_1_atom_num,
+            sum([coor[2] for coor in ring_1_coor]) / ring_1_atom_num,
+        ]
+        ring_2_center = [
+            sum([coor[0] for coor in ring_2_coor]) / ring_2_atom_num,
+            sum([coor[1] for coor in ring_2_coor]) / ring_2_atom_num,
+            sum([coor[2] for coor in ring_2_coor]) / ring_2_atom_num,
+        ]
+
         ## calculate the distance
-        dist = ((ring_1_center[0] - ring_2_center[0])**2 + 
-                (ring_1_center[1] - ring_2_center[1])**2 + 
-                (ring_1_center[2] - ring_2_center[2])**2 )**0.5
+        dist = (
+            (ring_1_center[0] - ring_2_center[0]) ** 2
+            + (ring_1_center[1] - ring_2_center[1]) ** 2
+            + (ring_1_center[2] - ring_2_center[2]) ** 2
+        ) ** 0.5
         distance.append(dist)
 
     return distance
 
 
 def calcAng(ring_1_frames, ring_2_frames):
+    """calculate the angle of normals of two rings"""
+
     ## check the frames of two ring
     if len(ring_1_frames) != len(ring_2_frames):
         print("Error -> length of frames of coordinates isn't equal")
         exit()
+
     ## calculate the angles
     angles = []
     for i in range(len(ring_1_frames)):
@@ -46,85 +60,113 @@ def calcAng(ring_1_frames, ring_2_frames):
         ring_2_coor = ring_2_frames[i]
         ## p1 = [ a1, a2, a3 ], p2 = [ b1, b2, b3 ]
         ## p1xp2 = [ a2b3 - a3b2, a3b1 - a1b3, a1b2 - a2b1 ]
+
         ## calculate the plane normal of ring 1 by cross product
-        r1_p1 = [ ring_1_coor[2][0] - ring_1_coor[0][0], 
-                ring_1_coor[2][1] - ring_1_coor[0][1],
-                ring_1_coor[2][2] - ring_1_coor[0][2]]
-        r1_p2 = [ ring_1_coor[4][0] - ring_1_coor[0][0], 
-                ring_1_coor[4][1] - ring_1_coor[0][1],
-                ring_1_coor[4][2] - ring_1_coor[0][2]]
-        r1_xProd = [ r1_p1[1]*r1_p2[2] - r1_p1[2]*r1_p2[1], 
-                r1_p1[2]*r1_p2[0] - r1_p1[0]*r1_p2[2], 
-                r1_p1[0]*r1_p2[1] - r1_p1[1]*r1_p2[0] ] 
+        r1_p1 = [
+            ring_1_coor[2][0] - ring_1_coor[0][0],
+            ring_1_coor[2][1] - ring_1_coor[0][1],
+            ring_1_coor[2][2] - ring_1_coor[0][2],
+        ]
+        r1_p2 = [
+            ring_1_coor[4][0] - ring_1_coor[0][0],
+            ring_1_coor[4][1] - ring_1_coor[0][1],
+            ring_1_coor[4][2] - ring_1_coor[0][2],
+        ]
+        r1_xProd = [
+            r1_p1[1] * r1_p2[2] - r1_p1[2] * r1_p2[1],
+            r1_p1[2] * r1_p2[0] - r1_p1[0] * r1_p2[2],
+            r1_p1[0] * r1_p2[1] - r1_p1[1] * r1_p2[0],
+        ]
+
         ## calculate the plane normal of ring 2 by cross product
-        r2_p1 = [ ring_2_coor[2][0] - ring_2_coor[0][0], 
-                ring_2_coor[2][1] - ring_2_coor[0][1],
-                ring_2_coor[2][2] - ring_2_coor[0][2]]
-        r2_p2 = [ ring_2_coor[4][0] - ring_2_coor[0][0], 
-                ring_2_coor[4][1] - ring_2_coor[0][1],
-                ring_2_coor[4][2] - ring_2_coor[0][2]]
-        r2_xProd = [ r2_p1[1]*r2_p2[2] - r2_p1[2]*r2_p2[1], 
-                r2_p1[2]*r2_p2[0] - r2_p1[0]*r2_p2[2], 
-                r2_p1[0]*r2_p2[1] - r2_p1[1]*r2_p2[0] ] 
-        ## calc the degree 
+        r2_p1 = [
+            ring_2_coor[2][0] - ring_2_coor[0][0],
+            ring_2_coor[2][1] - ring_2_coor[0][1],
+            ring_2_coor[2][2] - ring_2_coor[0][2],
+        ]
+        r2_p2 = [
+            ring_2_coor[4][0] - ring_2_coor[0][0],
+            ring_2_coor[4][1] - ring_2_coor[0][1],
+            ring_2_coor[4][2] - ring_2_coor[0][2],
+        ]
+        r2_xProd = [
+            r2_p1[1] * r2_p2[2] - r2_p1[2] * r2_p2[1],
+            r2_p1[2] * r2_p2[0] - r2_p1[0] * r2_p2[2],
+            r2_p1[0] * r2_p2[1] - r2_p1[1] * r2_p2[0],
+        ]
+
+        ## calc the degree
         dotProduct = r1_xProd[0] * r2_xProd[0] + r1_xProd[1] * r2_xProd[1]
         dotProduct += r1_xProd[2] * r2_xProd[2]
-        r1_xProd_norm = (r1_xProd[0]**2 + r1_xProd[1]**2 + r1_xProd[2]**2)**0.5
-        r2_xProd_norm = (r2_xProd[0]**2 + r2_xProd[1]**2 + r2_xProd[2]**2)**0.5
+        r1_xProd_norm = (r1_xProd[0] ** 2 + r1_xProd[1] ** 2 + r1_xProd[2] ** 2) ** 0.5
+        r2_xProd_norm = (r2_xProd[0] ** 2 + r2_xProd[1] ** 2 + r2_xProd[2] ** 2) ** 0.5
         cos_degree = dotProduct / (r1_xProd_norm * r2_xProd_norm)
-        degree = math.acos(cos_degree) * 180 / math.pi 
-        if degree > 90 :
+        degree = math.acos(cos_degree) * 180 / math.pi
+        if degree > 90:
             degree = 180 - degree
+
         angles.append(degree)
 
     return angles
 
 
 def getCoor(gro_file, ring_1_id, ring_2_id):
-    with open(gro_file, "r") as fo: 
+    """get che coordinates from gro file"""
+
+    with open(gro_file, "r") as fo:
         lines = fo.readlines()
+
     frames = []
     atom_lines = []
     for line in lines:
         ## not the atom line, judged by length of line
         if len(line) != 45 and len(line) != 69:
-            # number line
+            ## use number line as frames split anchor
             if len(line.strip().split()) == 1:
                 if len(atom_lines) != 0:
                     frames.append(atom_lines)
                 atom_lines = []
+        ## add atom line
         elif len(line) == 45 or len(line) == 69:
             if len(line[20:44].split()) == 3:
                 atom_lines.append(line.rstrip())
     ## add the last frame
     if len(atom_lines) != 0:
         frames.append(atom_lines)
+
     ## read the atom coor
     ring_1_frames = []
     ring_2_frames = []
     for frame in frames:
         ring_1_coor = []
         ring_2_coor = []
+        ## add atom coor by atom id
         for line in frame:
             if int(line[15:20]) in ring_1_id:
-                ring_1_coor.append([
-                    float(line[20:28]), float(line[28:36]), float(line[36:44]) ])
+                ring_1_coor.append(
+                    [float(line[20:28]), float(line[28:36]), float(line[36:44])]
+                )
             if int(line[15:20]) in ring_2_id:
-                ring_2_coor.append([
-                    float(line[20:28]), float(line[28:36]), float(line[36:44]) ])
+                ring_2_coor.append(
+                    [float(line[20:28]), float(line[28:36]), float(line[36:44])]
+                )
+        ## check atom coor and atom id length
         if len(ring_1_coor) != len(ring_1_id) or len(ring_2_coor) != len(ring_2_id):
             print("Error -> shit happens when reading coordinates of ring")
             exit()
         ring_1_frames.append(ring_1_coor)
         ring_2_frames.append(ring_2_coor)
+
     ## new a time sequence
-    time = [ i for i in range(len(frames)) ]            
+    time = [i for i in range(len(frames))]
 
     return time, ring_1_frames, ring_2_frames
 
 
 def dealNdx(ndx_file):
-    with open(ndx_file, 'r') as fo:
+    """read index file and get atom id"""
+
+    with open(ndx_file, "r") as fo:
         content = fo.read()
     ## read in each group
     ndx_dic = {}
@@ -135,76 +177,95 @@ def dealNdx(ndx_file):
         if items[0].strip() in ndx_dic.keys():
             print("Error -> two groups with the same name")
             exit()
-        ndx_dic[items[0].strip()] = [ int(n.strip()) 
-                for n in items[1].split() if n != "" ]
+        ndx_dic[items[0].strip()] = [
+            int(n.strip()) for n in items[1].split() if n != ""
+        ]
+
     ## print to get input from user
     print("Info -> reading your index file:")
     for name, num_lis in ndx_dic.items():
         print("    {:30}   {:8} atoms".format(name, len(num_lis)))
         # print(" ".join([ str(i) for i in num_lis]))
-    ring_1_name = input("Type the name of first ring -> ")
+    ring_1_name = input("Type the name of ring 1 -> ")
     print("Info -> you have chosed " + ring_1_name + " as first ring.")
-    ring_2_name = input("Type the name of second ring -> ")
+    ring_2_name = input("Type the name of ring 2 -> ")
     print("Info -> you have chosed " + ring_2_name + " as second ring.")
+
     ## atom id of two ring groups
     ring_1_id = ndx_dic[ring_1_name]
     ring_2_id = ndx_dic[ring_2_name]
 
     ## return the atom ids of these two rings
-    return ring_1_id, ring_2_id 
+    return ring_1_id, ring_2_id
 
 
 def main():
     ## parse the input argvs
     print("Info -> To calculate the distance and angles of two 5 or 6 membered rings")
     parser = argparse.ArgumentParser()
-    parser.add_argument("-n", help = "index file which contains two groups of rings")
-    parser.add_argument("-f", help = "gro file")
-    parser.add_argument("-b", default=0, type=int, 
-            help = "set the start time, default=0")
-    parser.add_argument("-dt", default=1, type=int, 
-            help = "set the time interval, default=1")
-    parser.add_argument("-o", default="output.xvg", 
-            help = "the results data, default output.xvg")
+    parser.add_argument("-n", help="index file which contains two groups of rings")
+    parser.add_argument("-f", help="gro file")
+    parser.add_argument("-b", default=0, type=int, help="set the start time, default=0")
+    parser.add_argument(
+        "-dt", default=1, type=int, help="set the time interval, default=1"
+    )
+    parser.add_argument(
+        "-o", default="output.xvg", help="the results data, default output.xvg"
+    )
     args = parser.parse_args()
+
     ndx_file = args.n
     gro_file = args.f
     output_file = args.o
+
+    ## check file existance
     if ndx_file not in os.listdir():
         print("Error -> no ", ndx_file, " in current directory")
         exit()
     if gro_file not in os.listdir():
         print("Error -> no ", gro_file, " in current directory")
         exit()
+
     ## get the atom id
     ring_1_id, ring_2_id = dealNdx(ndx_file)
-    if len(ring_1_id) < 5 or len(ring_1_id) > 7 or \
-            len(ring_2_id) < 5 or len(ring_2_id) > 7 : 
+    if (
+        len(ring_1_id) < 5
+        or len(ring_1_id) > 7
+        or len(ring_2_id) < 5
+        or len(ring_2_id) > 7
+    ):
         print("Error -> index of your first ring is more than 7 or less than 5")
         print("Error -> only support 5 or 6 membered ring which is in a plane ")
         print("Error -> please check your index file")
         print("Error -> your index : ", ring_1_id, ring_2_id)
         exit()
+
     ## get the coordinates of two rings
     time, ring_1_frames, ring_2_frames = getCoor(gro_file, ring_1_id, ring_2_id)
     ## modify the time sequence
-    time = [ t*args.dt + args.b for t in time ]
+    time = [t * args.dt + args.b for t in time]
     # print(len(time), len(ring_1_frames), len(ring_2_frames))
+
     ## calculate the distance of two rings
     distance = calcDist(ring_1_frames, ring_2_frames)
+
     ## calculate the angles of the normals of two rings
     angles = calcAng(ring_1_frames, ring_2_frames)
     # print(len(time), len(distance), len(angles))
-    ## check data and output
+
+    ## check data and write results
     print("Info -> there is ", len(time), " frames in your gro file")
     if len(time) != len(distance) or len(time) != len(angles):
         print("Error -> length of time, dist, ang are not equal")
         print(len(time), len(distance), len(angles))
-    out_content = "{:<10} {:>10} {:>10} \n".format(
-            "time", "distance(nm)", "angle")
-    out_content += "\n".join(["{:<10.0f} {:>10.3f} {:>10.3f} ".format(
-        time[i], distance[i], angles[i] ) for i in range(len(distance))])
-    with open(output_file, 'w') as fo:
+    out_content = "{:<10} {:>10} {:>10} \n".format("time", "distance", "angle")
+    out_content += "\n".join(
+        [
+            "{:<10.0f} {:>10.3f} {:>10.3f} ".format(time[i], distance[i], angles[i])
+            for i in range(len(distance))
+        ]
+    )
+    with open(output_file, "w") as fo:
         fo.write(out_content)
 
     ## calc the angle distribution
@@ -214,21 +275,28 @@ def main():
             ang0_30 += 1
         elif ang >= 30 and ang < 60:
             ang30_60 += 1
-        elif ang > 60 :
+        elif ang > 60:
             ang60_90 += 1
-    print("Info =>  0 <= angle < 30 : {}/{} = {:>6.2%}".format(
-        ang0_30, len(time), ang0_30*1.0/len(time)))
-    print("Info => 30 <= angle < 60 : {}/{} = {:>6.2%}".format(
-        ang30_60, len(time), ang30_60*1.0/len(time)))
-    print("Info => 60 <= angle < 90 : {}/{} = {:>6.2%}".format(
-        ang60_90, len(time), ang60_90*1.0/len(time)))
+    print(
+        "Info =>  0 <= angle < 30 : {}/{} = {:>6.2%}".format(
+            ang0_30, len(time), ang0_30 * 1.0 / len(time)
+        )
+    )
+    print(
+        "Info => 30 <= angle < 60 : {}/{} = {:>6.2%}".format(
+            ang30_60, len(time), ang30_60 * 1.0 / len(time)
+        )
+    )
+    print(
+        "Info => 60 <= angle < 90 : {}/{} = {:>6.2%}".format(
+            ang60_90, len(time), ang60_90 * 1.0 / len(time)
+        )
+    )
     ## calc the average distance
-    print("Info => average distance : {:>10.4f} nm".format(
-        sum(distance)/len(time)))
+    print("Info => average distance : {:>10.4f} nm".format(sum(distance) / len(time)))
 
     print("Done -> good day ! ")
 
 
 if __name__ == "__main__":
     main()
-
