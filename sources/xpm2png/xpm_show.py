@@ -95,13 +95,25 @@ def readxpm(inputfile: str) -> tuple:
         exit()
 
     if len(xpm_data) != xpm_height:
-        print("ERROR -> rows of data ({}) is not equal to xpm height ({}), check it !".format(len(xpm_data), xpm_height))
+        print(
+            "ERROR -> rows of data ({}) is not equal to xpm height ({}), check it !".format(
+                len(xpm_data), xpm_height
+            )
+        )
         exit()
     if len(xpm_xaxis) != xpm_width and len(xpm_xaxis) != xpm_width + 1:
-        print("ERROR -> length of x-axis ({}) != xpm width ({}) or xpm width +1".format(len(xpm_xaxis), xpm_width))
+        print(
+            "ERROR -> length of x-axis ({}) != xpm width ({}) or xpm width +1".format(
+                len(xpm_xaxis), xpm_width
+            )
+        )
         exit()
     if len(xpm_yaxis) != xpm_height and len(xpm_yaxis) != xpm_height + 1:
-        print("ERROR -> length of y-axis ({}) != xpm height ({}) or xpm height +1".format(len(xpm_yaxis), xpm_height))
+        print(
+            "ERROR -> length of y-axis ({}) != xpm height ({}) or xpm height +1".format(
+                len(xpm_yaxis), xpm_height
+            )
+        )
         exit()
 
     if len(xpm_xaxis) == xpm_width + 1:
@@ -430,6 +442,104 @@ def combinexpm(xpm_file_list: list, outputpng: str, noshow: bool) -> None:
         plt.show()
 
 
+def xpm2gpl(xpmfiles: list) -> None:
+    """convert xpm file to gnuplot scripts"""
+
+    for xpm in xpmfiles:
+        ## check files
+        if not os.path.exists(xpm):
+            print("ERROR -> no {} in current directory".format(xpm))
+            exit()
+        xpm_png = xpm.split(".")[0] + ".png"
+        xpm_gpl = xpm.split(".")[0] + ".gpl"
+        if os.path.exists(xpm_png):
+            print(
+                "ERROR -> {} already in current directory, unable to write".format(
+                    xpm_png
+                )
+            )
+            exit()
+        if os.path.exists(xpm_gpl):
+            print(
+                "ERROR -> {} already in current directory, unable to write".format(
+                    xpm_gpl
+                )
+            )
+            exit()
+
+        (
+            xpm_title,
+            xpm_legend,
+            xpm_type,
+            xpm_xlabel,
+            xpm_ylabel,
+            xpm_width,
+            xpm_height,
+            xpm_color_num,
+            xpm_char_per_pixel,
+            chars,
+            colors,
+            notes,
+            colors_rgb,
+            xpm_xaxis,
+            xpm_yaxis,
+            xpm_data,
+        ) = readxpm(xpm)
+
+        xpm_yaxis.reverse()
+
+        ## write gnuplot scripts
+        gpl_lines = "set term png\n"
+        gpl_lines += """set output "{}.png" \n""".format(xpm.split(".")[0])
+        gpl_lines += "unset colorbox\n"
+        pal_line = "set pal defined("
+        for index, color in enumerate(colors):
+            pal_line += """{} "{}",""".format(index, color)
+        pal_line = pal_line.strip(",") + ")"
+        gpl_lines += pal_line + "\n\n"
+        ## add data lines
+        gpl_lines += "$data << EOD\n"
+        for l in range(len(xpm_data)):
+            for i in range(0, xpm_width * xpm_char_per_pixel, xpm_char_per_pixel):
+                value = chars.index(xpm_data[l][i : i + xpm_char_per_pixel])
+                gpl_lines += "{} {} {}\n".format(
+                    xpm_xaxis[int(i / xpm_char_per_pixel)], xpm_yaxis[l], value
+                )
+        gpl_lines += "EOD\n\n"
+        ## add tail part of gpl file
+        gpl_lines += "#set tmargin at screen 0.95\n"
+        gpl_lines += "#set bmargin at screen 0.20\n"
+        gpl_lines += "#set rmargin at screen 0.85\n"
+        y_posi = 0.92
+        for index, note in enumerate(notes):
+            label_line = """#set label "{:10}" at screen 0.85,{:.2f} left textcolor rgb "{}"\n""".format(
+                note, y_posi, colors[index]
+            )
+            y_posi -= 0.10
+            gpl_lines += label_line
+        gpl_lines += """set term pngcairo enhanced truecolor font "Arial,85" fontscale 1 linewidth 20 pointscale 5 size 10000,6000\n"""
+        gpl_lines += "set tics out nomirror;\n"
+        gpl_lines += "set key out reverse Left spacing 2 samplen 1/2\n"
+        gpl_lines += """set title "{}"\n""".format(xpm_title)
+        gpl_lines += """set xlabel "{}"; set ylabel "{}";\n""".format(
+            xpm_xlabel, xpm_ylabel
+        )
+        gpl_lines += """plot [{}:{}] [{}:{}] $data u 1:2:3 w imag notit, \\\n""".format(
+            min(xpm_xaxis), max(xpm_xaxis), min(xpm_yaxis), max(xpm_yaxis)
+        )
+        for index, note in enumerate(notes):
+            gpl_lines += """-1 w p ps 3 pt 5 lc rgb "{}" t"{}", \\\n""".format(
+                colors[index], note
+            )
+        gpl_lines = gpl_lines.strip("\n").strip("\\").strip().strip(",")
+
+        ## write gpl files
+        with open(xpm.split(".")[0] + ".gpl", "w") as fo:
+            fo.write(gpl_lines + "\n")
+
+        print("Info -> write gnuplot scripts from {} successfully".format(xpm))
+
+
 def main():
     parser = argparse.ArgumentParser(description="Process xpm files generated by GMX")
     parser.add_argument("-f", "--inputfile", help="input your xpm file")
@@ -464,6 +574,12 @@ def main():
         nargs="+",
         help="specify xpm files to extract scatter data and save to csv file",
     )
+    parser.add_argument(
+        "-g",
+        "--gnuplot",
+        nargs="+",
+        help="specify xpm files to convert into gnuplot scripts (.gpl file)",
+    )
     args = parser.parse_args()
 
     inputxpm = args.inputfile
@@ -473,6 +589,7 @@ def main():
     xpms2combine = args.combine
     pcm = args.pcolormesh
     extract_files = args.extract
+    gnuplot_files = args.gnuplot
 
     if inputxpm != None and xpms2combine != None:
         print("ERROR -> do not specify -f and -c at once ")
@@ -489,6 +606,9 @@ def main():
 
     if extract_files != None:
         extract_scatter(extract_files)
+
+    if gnuplot_files != None:
+        xpm2gpl(gnuplot_files)
 
     print("Good Day !")
 
