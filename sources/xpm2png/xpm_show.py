@@ -2,6 +2,7 @@
 ## date : 20220130
 
 import os
+import math
 import argparse
 import numpy as np
 from scipy.interpolate import interp2d
@@ -413,8 +414,13 @@ def combinexpm(xpm_file_list: list, outputpng: str, noshow: bool) -> None:
     """combine xpm by scatters"""
 
     x_list, y_list = [], []
+    xpm_title, xpm_legend, xpm_xlabel, xpm_ylabel= "", "", "", ""
     for file in xpm_file_list:
         xpm_infos = readxpm(file)
+        xpm_title = xpm_infos[0]
+        xpm_legend = xpm_infos[1]
+        xpm_xlabel = xpm_infos[3]
+        xpm_ylabel = xpm_infos[4]
         if xpm_infos[2] != "Continuous":
             print("ERROR -> can not combine xpm whose type is not Continuous")
             exit()
@@ -432,6 +438,10 @@ def combinexpm(xpm_file_list: list, outputpng: str, noshow: bool) -> None:
     plt.imshow(heatmap.T, origin="lower", extent=extent, cmap="jet_r")
     plt.xlim(extent[0], extent[1])
     plt.ylim(extent[2], extent[3])
+    plt.title(xpm_title)
+    plt.xlabel(xpm_xlabel)
+    plt.ylabel(xpm_ylabel)
+    print("Legend of this xpm figure -> ", xpm_legend)
 
     if outputpng != None and os.path.exists(outputpng):
         print("ERROR -> {} already in current directory".format(outputpng))
@@ -502,7 +512,7 @@ def xpm2gpl(xpmfiles: list) -> None:
         for l in range(len(xpm_data)):
             for i in range(0, xpm_width * xpm_char_per_pixel, xpm_char_per_pixel):
                 value = chars.index(xpm_data[l][i : i + xpm_char_per_pixel])
-                gpl_lines += "{} {} {}\n".format(
+                gpl_lines += "{:.6f} {:.6f} {:.6f}\n".format(
                     xpm_xaxis[int(i / xpm_char_per_pixel)], xpm_yaxis[l], value
                 )
         gpl_lines += "EOD\n\n"
@@ -524,12 +534,15 @@ def xpm2gpl(xpmfiles: list) -> None:
         gpl_lines += """set xlabel "{}"; set ylabel "{}";\n""".format(
             xpm_xlabel, xpm_ylabel
         )
-        gpl_lines += """plot [{}:{}] [{}:{}] $data u 1:2:3 w imag notit, \\\n""".format(
-            min(xpm_xaxis), max(xpm_xaxis), min(xpm_yaxis), max(xpm_yaxis)
+        gpl_lines += """plot [{:.2f}:{:.2f}] [{:.2f}:{:.2f}] $data u 1:2:3 w imag notit, \\\n""".format(
+            math.floor(min(xpm_xaxis)*10.0)/10.0 - 0.1, 
+            math.ceil(max(xpm_xaxis)*10.0)/10.0 + 0.1, 
+            math.floor(min(xpm_yaxis)*10.0)/10.0 - 0.1, 
+            math.ceil(max(xpm_yaxis)*10.0)/10.0 + 0.1
         )
         for index, note in enumerate(notes):
-            gpl_lines += """-1 w p ps 3 pt 5 lc rgb "{}" t"{}", \\\n""".format(
-                colors[index], note
+            gpl_lines += """{} w p ps 3 pt 5 lc rgb "{}" t"{}", \\\n""".format(
+                math.floor(min(xpm_yaxis))-1, colors[index], note
             )
         gpl_lines = gpl_lines.strip("\n").strip("\\").strip().strip(",")
 
