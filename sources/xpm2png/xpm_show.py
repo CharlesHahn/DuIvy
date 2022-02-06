@@ -8,6 +8,30 @@ import numpy as np
 from scipy.interpolate import interp2d
 from scipy.ndimage.filters import gaussian_filter
 import matplotlib.pyplot as plt
+from matplotlib.ticker import AutoLocator, FormatStrFormatter, LinearLocator
+from matplotlib import pylab as pylab
+
+
+myparams = {
+    "axes.labelsize": "12",
+    "xtick.labelsize": "12",
+    "ytick.labelsize": "12",
+    "ytick.left": False,
+    "ytick.direction": "in",
+    "xtick.bottom": False,
+    "xtick.direction": "in",
+    "lines.linewidth": "2",
+    "axes.linewidth": "1",
+    "legend.fontsize": "12",
+    "legend.loc": "upper right",
+    "legend.fancybox": False,
+    "legend.frameon": False,
+    "font.family": "Arial",
+    "font.size": 12,
+    "figure.dpi": 150,
+    "savefig.dpi": 300,
+}
+pylab.rcParams.update(myparams)
 
 
 def readxpm(inputfile: str) -> tuple:
@@ -205,7 +229,6 @@ def drawxpm_origin(xpmfile: str, IP: bool, outputpng: str, noshow: bool) -> None
                 )
             img.append(rgb_line)
 
-        plt.figure()
         plt.imshow(img)
 
     if IP == True:
@@ -225,13 +248,16 @@ def drawxpm_origin(xpmfile: str, IP: bool, outputpng: str, noshow: bool) -> None
         im = plt.imshow(imgIP, cmap="jet", interpolation="bilinear")
         plt.colorbar(im, fraction=0.046, pad=0.04)
 
-    plt.title(xpm_title)
-    plt.xlabel(xpm_xlabel)
-    plt.ylabel(xpm_ylabel)
-    print("Legend of this xpm figure -> ", xpm_legend)
+    ## TODO:resize the img
+    width_to_height = len(xpm_xaxis) / len(xpm_yaxis)
+    if width_to_height >= 10 or width_to_height <= 0.1:
+        print("Test")
 
+    ## TODO: find a better way to solve problem of ticks
     # set the ticks
-    x_tick, y_tick = 10, 10
+    x_tick, y_tick = 3, 3
+    xpm_xticks = ["{:.1f}".format(x) for x in xpm_xaxis]
+    xpm_yticks = ["{:.1f}".format(y) for y in xpm_yaxis]
     if xpm_width < 100:
         x_tick = int(xpm_width / 3)
     elif xpm_width >= 100 and xpm_width < 1000:
@@ -244,20 +270,32 @@ def drawxpm_origin(xpmfile: str, IP: bool, outputpng: str, noshow: bool) -> None
         y_tick = int(xpm_height / 5)
     elif xpm_height > 500:
         y_tick = int(xpm_height / 10)
+    if xpm_width / xpm_height > 10:
+        y_tick = int(xpm_height)
+    if xpm_height / xpm_width > 10:
+        x_tick = int(xpm_width)
     plt.tick_params(axis="both", which="major")
-    x_major_locator = plt.MultipleLocator(x_tick)
-    y_major_locator = plt.MultipleLocator(y_tick)
-    ax = plt.gca()
-    ax.xaxis.set_major_locator(x_major_locator)
-    ax.yaxis.set_major_locator(y_major_locator)
     plt.xticks(
-        [w for w in range(1, xpm_width + 1, x_tick)],
-        ["{:.2f}".format(xpm_xaxis[i]) for i in range(0, len(xpm_xaxis), x_tick)],
+        [0]
+        + [w for w in range(x_tick, xpm_width - int(x_tick / 2), x_tick)]
+        + [xpm_width - 1],
+        [xpm_xticks[0]]
+        + [xpm_xticks[w] for w in range(x_tick, xpm_width - int(x_tick / 2), x_tick)]
+        + [xpm_xticks[-1]],
     )
     plt.yticks(
-        [h for h in range(1, xpm_height + 1, y_tick)],
-        ["{:.2f}".format(xpm_yaxis[i]) for i in range(0, len(xpm_yaxis), y_tick)],
+        [0]
+        + [h for h in range(y_tick, xpm_height - int(y_tick / 2), y_tick)]
+        + [xpm_height - 1],
+        [xpm_yticks[0]]
+        + [xpm_yticks[h] for h in range(y_tick, xpm_height - int(y_tick / 2), y_tick)]
+        + [xpm_yticks[-1]],
     )
+
+    plt.title(xpm_title)
+    plt.xlabel(xpm_xlabel)
+    plt.ylabel(xpm_ylabel)
+    print("Legend of this xpm figure -> ", xpm_legend)
 
     if outputpng != None:
         plt.savefig(outputpng, dpi=300)
@@ -322,7 +360,109 @@ def drawxpm_newIP(xpmfile: str, IP: bool, outputpng: str, noshow: bool) -> None:
         ## show figure
         plt.pcolormesh(x_new, y_new, value_new, cmap="jet", shading="auto")
 
+    ax = plt.gca()
+    ax.yaxis.set_major_formatter(FormatStrFormatter("%.1f"))
+    ax.xaxis.set_major_formatter(FormatStrFormatter("%.1f"))
     plt.colorbar()
+    plt.title(xpm_title)
+    plt.xlabel(xpm_xlabel)
+    plt.ylabel(xpm_ylabel)
+    print("Legend of this xpm figure -> ", xpm_legend)
+
+    if outputpng != None:
+        plt.savefig(outputpng, dpi=300)
+    if noshow == False:
+        plt.show()
+
+
+def drawxpm_3D(xpmfile: str, IP: bool, outputpng: str, noshow: bool) -> None:
+    """draw xpm 3D figure with interpolation"""
+
+    ## check parameters
+    if not os.path.exists(xpmfile):
+        print("ERROR -> {} not in current directory".format(xpmfile))
+        exit()
+    if outputpng != None and os.path.exists(outputpng):
+        print("ERROR -> {} already in current directory".format(outputpng))
+        exit()
+
+    (
+        xpm_title,
+        xpm_legend,
+        xpm_type,
+        xpm_xlabel,
+        xpm_ylabel,
+        xpm_width,
+        xpm_height,
+        xpm_color_num,
+        xpm_char_per_pixel,
+        chars,
+        colors,
+        notes,
+        colors_rgb,
+        xpm_xaxis,
+        xpm_yaxis,
+        xpm_data,
+    ) = readxpm(xpmfile)
+
+    if xpm_type != "Continuous":
+        print("ERROR -> Only Continuous type xpm file can draw 3D figure")
+        exit()
+
+    xpm_yaxis.reverse()
+
+    values = []
+    for line in xpm_data:
+        for i in range(0, xpm_width * xpm_char_per_pixel, xpm_char_per_pixel):
+            values.append(float(notes[chars.index(line[i : i + xpm_char_per_pixel])]))
+    xpm_xaxis = np.array(xpm_xaxis)
+    xpm_yaxis = np.array(xpm_yaxis)
+    img = np.array(values)
+
+    fig = plt.figure()
+    ax = fig.gca(projection="3d")
+
+    ## interpolation
+    IP_value = 1
+    if IP == False:
+        IP_value = 1
+    elif IP == True:
+        IP_value = 12
+
+    img = img.reshape(len(xpm_xaxis), len(xpm_yaxis))
+    ip_func = interp2d(xpm_xaxis, xpm_yaxis, img, kind="linear")
+    x_new = np.linspace(np.min(xpm_xaxis), np.max(xpm_xaxis), IP_value * len(xpm_xaxis))
+    y_new = np.linspace(np.min(xpm_yaxis), np.max(xpm_yaxis), IP_value * len(xpm_yaxis))
+    img_new = ip_func(x_new, y_new)
+    x_new, y_new = np.meshgrid(x_new, y_new)
+    img_new = img_new.reshape(len(x_new), len(y_new))
+
+    ## show figure
+    surf = ax.plot_surface(
+        x_new,
+        y_new,
+        img_new,
+        alpha=0.9,
+        cmap="coolwarm",
+        linewidth=0,
+        antialiased=False,
+    )
+    ## set the 2d surface location
+    ax.contourf(
+        x_new,
+        y_new,
+        img_new,
+        zdir="z",
+        offset=math.floor(min(values)) - 0.5,
+        cmap="coolwarm",
+    )
+
+    ax.zaxis.set_major_locator(AutoLocator())
+    ax.zaxis.set_major_formatter(FormatStrFormatter("%.1f"))
+    ax.yaxis.set_major_formatter(FormatStrFormatter("%.1f"))
+    ax.xaxis.set_major_formatter(FormatStrFormatter("%.1f"))
+    # ax.set_zlim(0, )
+    plt.colorbar(surf, shrink=0.6, aspect=12)
     plt.title(xpm_title)
     plt.xlabel(xpm_xlabel)
     plt.ylabel(xpm_ylabel)
@@ -414,7 +554,7 @@ def combinexpm(xpm_file_list: list, outputpng: str, noshow: bool) -> None:
     """combine xpm by scatters"""
 
     x_list, y_list = [], []
-    xpm_title, xpm_legend, xpm_xlabel, xpm_ylabel= "", "", "", ""
+    xpm_title, xpm_legend, xpm_xlabel, xpm_ylabel = "", "", "", ""
     for file in xpm_file_list:
         xpm_infos = readxpm(file)
         xpm_title = xpm_infos[0]
@@ -438,6 +578,9 @@ def combinexpm(xpm_file_list: list, outputpng: str, noshow: bool) -> None:
     plt.imshow(heatmap.T, origin="lower", extent=extent, cmap="jet_r")
     plt.xlim(extent[0], extent[1])
     plt.ylim(extent[2], extent[3])
+    ax = plt.gca()
+    ax.yaxis.set_major_formatter(FormatStrFormatter("%.1f"))
+    ax.xaxis.set_major_formatter(FormatStrFormatter("%.1f"))
     plt.title(xpm_title)
     plt.xlabel(xpm_xlabel)
     plt.ylabel(xpm_ylabel)
@@ -535,14 +678,14 @@ def xpm2gpl(xpmfiles: list) -> None:
             xpm_xlabel, xpm_ylabel
         )
         gpl_lines += """plot [{:.2f}:{:.2f}] [{:.2f}:{:.2f}] $data u 1:2:3 w imag notit, \\\n""".format(
-            math.floor(min(xpm_xaxis)*10.0)/10.0 - 0.1, 
-            math.ceil(max(xpm_xaxis)*10.0)/10.0 + 0.1, 
-            math.floor(min(xpm_yaxis)*10.0)/10.0 - 0.1, 
-            math.ceil(max(xpm_yaxis)*10.0)/10.0 + 0.1
+            math.floor(min(xpm_xaxis) * 10.0) / 10.0 - 0.1,
+            math.ceil(max(xpm_xaxis) * 10.0) / 10.0 + 0.1,
+            math.floor(min(xpm_yaxis) * 10.0) / 10.0 - 0.1,
+            math.ceil(max(xpm_yaxis) * 10.0) / 10.0 + 0.1,
         )
         for index, note in enumerate(notes):
             gpl_lines += """{} w p ps 3 pt 5 lc rgb "{}" t"{}", \\\n""".format(
-                math.floor(min(xpm_yaxis))-1, colors[index], note
+                math.floor(min(xpm_yaxis)) - 1, colors[index], note
             )
         gpl_lines = gpl_lines.strip("\n").strip("\\").strip().strip(",")
 
@@ -568,6 +711,12 @@ def main():
         "--pcolormesh",
         action="store_true",
         help="whether to apply pcolormesh function to draw",
+    )
+    parser.add_argument(
+        "-3d",
+        "--threeDimensions",
+        action="store_true",
+        help="whether to draw 3D figure",
     )
     parser.add_argument(
         "-ns",
@@ -603,6 +752,7 @@ def main():
     pcm = args.pcolormesh
     extract_files = args.extract
     gnuplot_files = args.gnuplot
+    fig_3d = args.threeDimensions
 
     if inputxpm != None and xpms2combine != None:
         print("ERROR -> do not specify -f and -c at once ")
@@ -612,9 +762,11 @@ def main():
         combinexpm(xpms2combine, outputpng, noshow)
 
     if inputxpm != None:
-        if pcm == False:
+        if fig_3d == True:
+            drawxpm_3D(inputxpm, ip, outputpng, noshow)
+        if pcm == False and fig_3d == False:
             drawxpm_origin(inputxpm, ip, outputpng, noshow)
-        elif pcm == True:
+        elif pcm == True and fig_3d == False:
             drawxpm_newIP(inputxpm, ip, outputpng, noshow)
 
     if extract_files != None:
