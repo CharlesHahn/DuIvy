@@ -8,7 +8,7 @@ import numpy as np
 from scipy.interpolate import interp2d
 from scipy.ndimage.filters import gaussian_filter
 import matplotlib.pyplot as plt
-from matplotlib.ticker import AutoLocator, FormatStrFormatter, LinearLocator
+from matplotlib.ticker import AutoLocator, FormatStrFormatter
 from matplotlib import pylab as pylab
 
 
@@ -229,7 +229,7 @@ def drawxpm_origin(xpmfile: str, IP: bool, outputpng: str, noshow: bool) -> None
                 )
             img.append(rgb_line)
 
-        plt.imshow(img)
+        plt.imshow(img, aspect="auto")
 
     if IP == True:
         if xpm_type != "Continuous":
@@ -245,13 +245,8 @@ def drawxpm_origin(xpmfile: str, IP: bool, outputpng: str, noshow: bool) -> None
                 )
             imgIP.append(value_line)
 
-        im = plt.imshow(imgIP, cmap="jet", interpolation="bilinear")
+        im = plt.imshow(imgIP, cmap="jet", interpolation="bilinear", aspect="auto")
         plt.colorbar(im, fraction=0.046, pad=0.04)
-
-    ## TODO:resize the img
-    width_to_height = len(xpm_xaxis) / len(xpm_yaxis)
-    if width_to_height >= 10 or width_to_height <= 0.1:
-        print("Test")
 
     ## TODO: find a better way to solve problem of ticks
     # set the ticks
@@ -271,9 +266,9 @@ def drawxpm_origin(xpmfile: str, IP: bool, outputpng: str, noshow: bool) -> None
     elif xpm_height > 500:
         y_tick = int(xpm_height / 10)
     if xpm_width / xpm_height > 10:
-        y_tick = int(xpm_height)
+        y_tick = int(xpm_height / 2)
     if xpm_height / xpm_width > 10:
-        x_tick = int(xpm_width)
+        x_tick = int(xpm_width / 2)
     plt.tick_params(axis="both", which="major")
     plt.xticks(
         [0]
