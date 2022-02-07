@@ -11,7 +11,6 @@ import matplotlib.pyplot as plt
 from matplotlib.ticker import AutoLocator, FormatStrFormatter
 from matplotlib import pylab as pylab
 
-
 myparams = {
     "axes.labelsize": "12",
     "xtick.labelsize": "12",
@@ -35,7 +34,8 @@ pylab.rcParams.update(myparams)
 
 
 def readxpm(inputfile: str) -> tuple:
-    """read xpm file and return infos"""
+    """ read xpm file and return all infos """
+
     xpm_title, xpm_legend, xpm_type = "", "", ""
     xpm_xlabel, xpm_ylabel = "", ""
     xpm_width, xpm_height = 0, 0
@@ -43,10 +43,10 @@ def readxpm(inputfile: str) -> tuple:
     chars, colors, notes, colors_rgb = [], [], [], []
     xpm_xaxis, xpm_yaxis, xpm_data = [], [], []
 
+    ## check and read xpm file
     if not os.path.exists(inputfile):
         print("ERROR -> no {} in current directory")
         exit()
-
     with open(inputfile, "r") as fo:
         lines = [line.strip() for line in fo.readlines()]
 
@@ -109,7 +109,7 @@ def readxpm(inputfile: str) -> tuple:
         ):
             xpm_data.append(line.strip().strip(",").strip('"'))
 
-    ## check data
+    ## check infos
     if len(chars) != len(colors) != len(notes) != xpm_color_num:
         print("Wrong -> length of chars, colors, notes != xpm_color_num")
         print(
@@ -187,7 +187,12 @@ def readxpm(inputfile: str) -> tuple:
 
 
 def drawxpm_origin(xpmfile: str, IP: bool, outputpng: str, noshow: bool) -> None:
-    """draw xpm figure"""
+    """ draw xpm figure by plt.imshow
+        xpmfile: input xpm file
+        IP : whether to interpolation
+        outputpng: the name for figure output
+        noshow: whether not to show figure, useful for PC without gui
+    """
 
     ## check parameters
     if not os.path.exists(xpmfile):
@@ -216,9 +221,11 @@ def drawxpm_origin(xpmfile: str, IP: bool, outputpng: str, noshow: bool) -> None
         xpm_data,
     ) = readxpm(xpmfile)
 
+    ## the read order of pixels is from top to bottom
+    ## but the y-axis is from bottom to top, so reverse() is important !
     xpm_yaxis.reverse()
 
-    # visualization
+    # visualization of xpm
     if IP == False:
         img = []
         for line in xpm_data:
@@ -249,7 +256,7 @@ def drawxpm_origin(xpmfile: str, IP: bool, outputpng: str, noshow: bool) -> None
         plt.colorbar(im, fraction=0.046, pad=0.04)
 
     ## TODO: find a better way to solve problem of ticks
-    # set the ticks
+    ## set the ticks
     x_tick, y_tick = 3, 3
     xpm_xticks = ["{:.1f}".format(x) for x in xpm_xaxis]
     xpm_yticks = ["{:.1f}".format(y) for y in xpm_yaxis]
@@ -287,6 +294,7 @@ def drawxpm_origin(xpmfile: str, IP: bool, outputpng: str, noshow: bool) -> None
         + [xpm_yticks[-1]],
     )
 
+    ## set other infos in the figure
     plt.title(xpm_title)
     plt.xlabel(xpm_xlabel)
     plt.ylabel(xpm_ylabel)
@@ -299,7 +307,12 @@ def drawxpm_origin(xpmfile: str, IP: bool, outputpng: str, noshow: bool) -> None
 
 
 def drawxpm_newIP(xpmfile: str, IP: bool, outputpng: str, noshow: bool) -> None:
-    """draw xpm figure with interpolation by pcolormesh"""
+    """ draw xpm figure by pcolormesh (with interpolation)
+        xpmfile: input xpm file
+        IP : whether to interpolation
+        outputpng: the name for figure output
+        noshow: whether not to show figure, useful for PC without gui
+    """
 
     ## check parameters
     if not os.path.exists(xpmfile):
@@ -334,6 +347,7 @@ def drawxpm_newIP(xpmfile: str, IP: bool, outputpng: str, noshow: bool) -> None:
 
     xpm_yaxis.reverse()
 
+    ## convert xpm_data to img (values)
     img = []
     for line in xpm_data:
         value_line = []
@@ -355,6 +369,7 @@ def drawxpm_newIP(xpmfile: str, IP: bool, outputpng: str, noshow: bool) -> None:
         ## show figure
         plt.pcolormesh(x_new, y_new, value_new, cmap="jet", shading="auto")
 
+    ## set ticks and other figure infos
     ax = plt.gca()
     ax.yaxis.set_major_formatter(FormatStrFormatter("%.1f"))
     ax.xaxis.set_major_formatter(FormatStrFormatter("%.1f"))
@@ -371,7 +386,12 @@ def drawxpm_newIP(xpmfile: str, IP: bool, outputpng: str, noshow: bool) -> None:
 
 
 def drawxpm_3D(xpmfile: str, IP: bool, outputpng: str, noshow: bool) -> None:
-    """draw xpm 3D figure with interpolation"""
+    """ draw xpm 3D figure (with interpolation)
+        xpmfile: input xpm file
+        IP : whether to interpolation
+        outputpng: the name for figure output
+        noshow: whether not to show figure, useful for PC without gui
+    """
 
     ## check parameters
     if not os.path.exists(xpmfile):
@@ -406,6 +426,7 @@ def drawxpm_3D(xpmfile: str, IP: bool, outputpng: str, noshow: bool) -> None:
 
     xpm_yaxis.reverse()
 
+    ## convert xpm_data to values
     values = []
     for line in xpm_data:
         for i in range(0, xpm_width * xpm_char_per_pixel, xpm_char_per_pixel):
@@ -414,6 +435,7 @@ def drawxpm_3D(xpmfile: str, IP: bool, outputpng: str, noshow: bool) -> None:
     xpm_yaxis = np.array(xpm_yaxis)
     img = np.array(values)
 
+    ## draw 3d figure 
     fig = plt.figure()
     ax = fig.gca(projection="3d")
 
@@ -423,7 +445,6 @@ def drawxpm_3D(xpmfile: str, IP: bool, outputpng: str, noshow: bool) -> None:
         IP_value = 1
     elif IP == True:
         IP_value = 12
-
     img = img.reshape(len(xpm_xaxis), len(xpm_yaxis))
     ip_func = interp2d(xpm_xaxis, xpm_yaxis, img, kind="linear")
     x_new = np.linspace(np.min(xpm_xaxis), np.max(xpm_xaxis), IP_value * len(xpm_xaxis))
@@ -452,6 +473,7 @@ def drawxpm_3D(xpmfile: str, IP: bool, outputpng: str, noshow: bool) -> None:
         cmap="coolwarm",
     )
 
+    ## set the axis ticks and other figure infos
     ax.zaxis.set_major_locator(AutoLocator())
     ax.zaxis.set_major_formatter(FormatStrFormatter("%.1f"))
     ax.yaxis.set_major_formatter(FormatStrFormatter("%.1f"))
@@ -470,7 +492,9 @@ def drawxpm_3D(xpmfile: str, IP: bool, outputpng: str, noshow: bool) -> None:
 
 
 def get_scatter_data(xpm_infos: tuple) -> tuple:
-    """convert xpm_infos into scatter data"""
+    """ convert xpm_infos into scatter data
+        xpm_infos: the return of readxpm()
+    """
     (
         xpm_title,
         xpm_legend,
@@ -492,7 +516,7 @@ def get_scatter_data(xpm_infos: tuple) -> tuple:
 
     xpm_yaxis.reverse()
 
-    ## parse scatter data
+    ## parse xpm_data into x, y, v 
     x, y, v = [], [], []
     scatter_x, scatter_y = [], []
     # print(len(xpm_xaxis))
@@ -503,6 +527,7 @@ def get_scatter_data(xpm_infos: tuple) -> tuple:
             x.append(xpm_xaxis[int(i / xpm_char_per_pixel)])
             y.append(xpm_yaxis[l])
 
+    ## parse x, y, v into scatter_x, scatter_y 
     v_max = max(v)
     scatter_weight = 1
     for i in range(len(v)):
@@ -515,16 +540,16 @@ def get_scatter_data(xpm_infos: tuple) -> tuple:
 
 
 def extract_scatter(xpms: list) -> None:
-    """extract data from xpm and save to csv"""
+    """ extract data from xpm and save to csv """
 
     for xpm in xpms:
         if not os.path.exists(xpm):
             print("ERROR -> {} not in current directory".format(xpm))
             exit()
-        if xpm.split(".")[1] != "xpm":
+        if xpm.split(".")[-1] != "xpm":
             print("ERROR -> specify a file with suffix xpm")
             exit()
-        outcsv = xpm.split(".")[0] + ".csv"
+        outcsv = xpm.split(".")[-2] + ".csv"
         if os.path.exists(outcsv):
             print("ERROR -> {} already in current directory".format(outcsv))
             exit()
@@ -534,10 +559,12 @@ def extract_scatter(xpms: list) -> None:
             print("ERROR -> can not extract data from xpm whose type is not Continuous")
             exit()
 
+        ## only x, y, v values are needed
         _, _, x, y, v = get_scatter_data(xpm_infos)
         if len(x) != len(y) != len(v):
             print("ERROR -> wrong in length of x, y, v")
             exit()
+        ## write results
         with open(outcsv, "w") as fo:
             fo.write("{},{},{}\n".format("x-axis", "y-axis", "value"))
             for i in range(len(x)):
@@ -546,7 +573,11 @@ def extract_scatter(xpms: list) -> None:
 
 
 def combinexpm(xpm_file_list: list, outputpng: str, noshow: bool) -> None:
-    """combine xpm by scatters"""
+    """ combine xpm by scatters 
+        xpm_file_list : a list contains all xpm file names
+        outputpng : the name for figure output
+        noshow: whether not to show figure, useful for PC without gui
+    """
 
     x_list, y_list = [], []
     xpm_title, xpm_legend, xpm_xlabel, xpm_ylabel = "", "", "", ""
@@ -566,13 +597,14 @@ def combinexpm(xpm_file_list: list, outputpng: str, noshow: bool) -> None:
     ## combine xpm
     # plt.scatter(x_list, y_list)
     # plt.show()
-
     heatmap, xedges, yedges = np.histogram2d(x_list, y_list, bins=800)
     heatmap = gaussian_filter(heatmap, sigma=16)
     extent = [xedges[0], xedges[-1], yedges[0], yedges[-1]]
     plt.imshow(heatmap.T, origin="lower", extent=extent, cmap="jet_r")
     plt.xlim(extent[0], extent[1])
     plt.ylim(extent[2], extent[3])
+    
+    ## set ticks and other figure infos
     ax = plt.gca()
     ax.yaxis.set_major_formatter(FormatStrFormatter("%.1f"))
     ax.xaxis.set_major_formatter(FormatStrFormatter("%.1f"))
@@ -591,15 +623,17 @@ def combinexpm(xpm_file_list: list, outputpng: str, noshow: bool) -> None:
 
 
 def xpm2gpl(xpmfiles: list) -> None:
-    """convert xpm file to gnuplot scripts"""
+    """ convert xpm file to gnuplot scripts 
+        xpmfiles: a list contains xpm file names
+    """
 
     for xpm in xpmfiles:
         ## check files
         if not os.path.exists(xpm):
             print("ERROR -> no {} in current directory".format(xpm))
             exit()
-        xpm_png = xpm.split(".")[0] + ".png"
-        xpm_gpl = xpm.split(".")[0] + ".gpl"
+        xpm_png = xpm.split(".")[-2] + ".png"
+        xpm_gpl = xpm.split(".")[-2] + ".gpl"
         if os.path.exists(xpm_png):
             print(
                 "ERROR -> {} already in current directory, unable to write".format(
@@ -615,6 +649,7 @@ def xpm2gpl(xpmfiles: list) -> None:
             )
             exit()
 
+        ## read xpm files
         (
             xpm_title,
             xpm_legend,
@@ -749,6 +784,7 @@ def main():
     gnuplot_files = args.gnuplot
     fig_3d = args.threeDimensions
 
+    ## check parameters and call different functions
     if inputxpm != None and xpms2combine != None:
         print("ERROR -> do not specify -f and -c at once ")
         exit()
