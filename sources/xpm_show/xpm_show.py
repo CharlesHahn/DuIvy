@@ -34,7 +34,7 @@ pylab.rcParams.update(myparams)
 
 
 def readxpm(inputfile: str) -> tuple:
-    """ read xpm file and return all infos """
+    """read xpm file and return all infos"""
 
     xpm_title, xpm_legend, xpm_type = "", "", ""
     xpm_xlabel, xpm_ylabel = "", ""
@@ -187,11 +187,11 @@ def readxpm(inputfile: str) -> tuple:
 
 
 def drawxpm_origin(xpmfile: str, IP: bool, outputpng: str, noshow: bool) -> None:
-    """ draw xpm figure by plt.imshow
-        xpmfile: input xpm file
-        IP : whether to interpolation
-        outputpng: the name for figure output
-        noshow: whether not to show figure, useful for PC without gui
+    """draw xpm figure by plt.imshow
+    xpmfile: input xpm file
+    IP : whether to interpolation
+    outputpng: the name for figure output
+    noshow: whether not to show figure, useful for PC without gui
     """
 
     ## check parameters
@@ -307,11 +307,11 @@ def drawxpm_origin(xpmfile: str, IP: bool, outputpng: str, noshow: bool) -> None
 
 
 def drawxpm_newIP(xpmfile: str, IP: bool, outputpng: str, noshow: bool) -> None:
-    """ draw xpm figure by pcolormesh (with interpolation)
-        xpmfile: input xpm file
-        IP : whether to interpolation
-        outputpng: the name for figure output
-        noshow: whether not to show figure, useful for PC without gui
+    """draw xpm figure by pcolormesh (with interpolation)
+    xpmfile: input xpm file
+    IP : whether to interpolation
+    outputpng: the name for figure output
+    noshow: whether not to show figure, useful for PC without gui
     """
 
     ## check parameters
@@ -386,11 +386,11 @@ def drawxpm_newIP(xpmfile: str, IP: bool, outputpng: str, noshow: bool) -> None:
 
 
 def drawxpm_3D(xpmfile: str, IP: bool, outputpng: str, noshow: bool) -> None:
-    """ draw xpm 3D figure (with interpolation)
-        xpmfile: input xpm file
-        IP : whether to interpolation
-        outputpng: the name for figure output
-        noshow: whether not to show figure, useful for PC without gui
+    """draw xpm 3D figure (with interpolation)
+    xpmfile: input xpm file
+    IP : whether to interpolation
+    outputpng: the name for figure output
+    noshow: whether not to show figure, useful for PC without gui
     """
 
     ## check parameters
@@ -435,7 +435,7 @@ def drawxpm_3D(xpmfile: str, IP: bool, outputpng: str, noshow: bool) -> None:
     xpm_yaxis = np.array(xpm_yaxis)
     img = np.array(values)
 
-    ## draw 3d figure 
+    ## draw 3d figure
     fig = plt.figure()
     ax = fig.gca(projection="3d")
 
@@ -469,7 +469,7 @@ def drawxpm_3D(xpmfile: str, IP: bool, outputpng: str, noshow: bool) -> None:
         y_new,
         img_new,
         zdir="z",
-        offset=math.floor(min(values)) - 0.5,
+        offset=math.floor(min(values)) - math.floor(max(values) - min(values)) / 30,
         cmap="coolwarm",
     )
 
@@ -492,8 +492,8 @@ def drawxpm_3D(xpmfile: str, IP: bool, outputpng: str, noshow: bool) -> None:
 
 
 def get_scatter_data(xpm_infos: tuple) -> tuple:
-    """ convert xpm_infos into scatter data
-        xpm_infos: the return of readxpm()
+    """convert xpm_infos into scatter data
+    xpm_infos: the return of readxpm()
     """
     (
         xpm_title,
@@ -516,7 +516,7 @@ def get_scatter_data(xpm_infos: tuple) -> tuple:
 
     xpm_yaxis.reverse()
 
-    ## parse xpm_data into x, y, v 
+    ## parse xpm_data into x, y, v
     x, y, v = [], [], []
     scatter_x, scatter_y = [], []
     # print(len(xpm_xaxis))
@@ -527,7 +527,7 @@ def get_scatter_data(xpm_infos: tuple) -> tuple:
             x.append(xpm_xaxis[int(i / xpm_char_per_pixel)])
             y.append(xpm_yaxis[l])
 
-    ## parse x, y, v into scatter_x, scatter_y 
+    ## parse x, y, v into scatter_x, scatter_y
     v_max = max(v)
     scatter_weight = 1
     for i in range(len(v)):
@@ -539,44 +539,48 @@ def get_scatter_data(xpm_infos: tuple) -> tuple:
     return scatter_x, scatter_y, x, y, v
 
 
-def extract_scatter(xpms: list) -> None:
-    """ extract data from xpm and save to csv """
+def extract_scatter(xpm: str, outcsv: str = None) -> None:
+    """extract data from xpm and save to csv"""
 
-    for xpm in xpms:
-        if not os.path.exists(xpm):
-            print("ERROR -> {} not in current directory".format(xpm))
-            exit()
-        if xpm.split(".")[-1] != "xpm":
-            print("ERROR -> specify a file with suffix xpm")
-            exit()
-        outcsv = xpm.split(".")[-2] + ".csv"
-        if os.path.exists(outcsv):
-            print("ERROR -> {} already in current directory".format(outcsv))
-            exit()
+    if not os.path.exists(xpm):
+        print("ERROR -> {} not in current directory".format(xpm))
+        exit()
+    if xpm[-4:] != ".xpm":
+        print("ERROR -> specify a file with suffix xpm")
+        exit()
+    if outcsv == None:
+        outcsv = xpm[:-4] + ".csv"
+    if outcsv[-4:] != ".csv":
+        print("ERROR -> specify a output file with suffix csv")
+        exit()
+    if os.path.exists(outcsv):
+        print("ERROR -> {} already in current directory".format(outcsv))
+        exit()
 
-        xpm_infos = readxpm(xpm)
-        if xpm_infos[2] != "Continuous":
-            print("ERROR -> can not extract data from xpm whose type is not Continuous")
-            exit()
+    xpm_infos = readxpm(xpm)
+    if xpm_infos[2] != "Continuous":
+        print("ERROR -> can not extract data from xpm whose type is not Continuous")
+        exit()
 
-        ## only x, y, v values are needed
-        _, _, x, y, v = get_scatter_data(xpm_infos)
-        if len(x) != len(y) != len(v):
-            print("ERROR -> wrong in length of x, y, v")
-            exit()
-        ## write results
-        with open(outcsv, "w") as fo:
-            fo.write("{},{},{}\n".format("x-axis", "y-axis", "value"))
-            for i in range(len(x)):
-                fo.write("{:.6f},{:.6f},{:.6f}\n".format(x[i], y[i], v[i]))
-        print("Info -> extract data from {} successfully".format(xpm))
+    ## only x, y, v values are needed
+    _, _, x, y, v = get_scatter_data(xpm_infos)
+    if len(x) != len(y) != len(v):
+        print("ERROR -> wrong in length of x, y, v")
+        exit()
+    ## write results
+    with open(outcsv, "w") as fo:
+        fo.write("{},{},{}\n".format("x-axis", "y-axis", "value"))
+        for i in range(len(x)):
+            fo.write("{:.6f},{:.6f},{:.6f}\n".format(x[i], y[i], v[i]))
+    print("Info -> extract data from {} successfully".format(xpm))
+    print("Info -> data are saved into {}".format(outcsv))
 
 
 def combinexpm(xpm_file_list: list, outputpng: str, noshow: bool) -> None:
-    """ combine xpm by scatters 
-        xpm_file_list : a list contains all xpm file names
-        outputpng : the name for figure output
-        noshow: whether not to show figure, useful for PC without gui
+    """combine xpm by scatters
+    xpm_file_list : a list contains all xpm file names
+    outputpng : the name for figure output
+    noshow: whether not to show figure, useful for PC without gui
     """
 
     x_list, y_list = [], []
@@ -603,7 +607,7 @@ def combinexpm(xpm_file_list: list, outputpng: str, noshow: bool) -> None:
     plt.imshow(heatmap.T, origin="lower", extent=extent, cmap="jet_r")
     plt.xlim(extent[0], extent[1])
     plt.ylim(extent[2], extent[3])
-    
+
     ## set ticks and other figure infos
     ax = plt.gca()
     ax.yaxis.set_major_formatter(FormatStrFormatter("%.1f"))
@@ -622,114 +626,106 @@ def combinexpm(xpm_file_list: list, outputpng: str, noshow: bool) -> None:
         plt.show()
 
 
-def xpm2gpl(xpmfiles: list) -> None:
-    """ convert xpm file to gnuplot scripts 
-        xpmfiles: a list contains xpm file names
+def xpm2gpl(xpm: str, outgpl: str = None) -> None:
+    """convert xpm file to gnuplot scripts
+    xpmfile: a list contains xpm file names
     """
 
-    for xpm in xpmfiles:
-        ## check files
-        if not os.path.exists(xpm):
-            print("ERROR -> no {} in current directory".format(xpm))
-            exit()
-        xpm_png = xpm.split(".")[-2] + ".png"
-        xpm_gpl = xpm.split(".")[-2] + ".gpl"
-        if os.path.exists(xpm_png):
-            print(
-                "ERROR -> {} already in current directory, unable to write".format(
-                    xpm_png
-                )
-            )
-            exit()
-        if os.path.exists(xpm_gpl):
-            print(
-                "ERROR -> {} already in current directory, unable to write".format(
-                    xpm_gpl
-                )
-            )
-            exit()
+    ## check files
+    if not os.path.exists(xpm):
+        print("ERROR -> {} not in current directory".format(xpm))
+        exit()
+    if xpm[-4:] != ".xpm":
+        print("ERROR -> specify a file with suffix xpm")
+        exit()
+    if outgpl == None:
+        outgpl = xpm[:-4] + ".gpl"
+    if os.path.exists(outgpl):
+        print("ERROR -> {} already in current directory".format(outgpl))
+        exit()
+    outpng = xpm[:-4] + ".png"
 
-        ## read xpm files
-        (
-            xpm_title,
-            xpm_legend,
-            xpm_type,
-            xpm_xlabel,
-            xpm_ylabel,
-            xpm_width,
-            xpm_height,
-            xpm_color_num,
-            xpm_char_per_pixel,
-            chars,
-            colors,
-            notes,
-            colors_rgb,
-            xpm_xaxis,
-            xpm_yaxis,
-            xpm_data,
-        ) = readxpm(xpm)
+    ## read xpm files
+    (
+        xpm_title,
+        xpm_legend,
+        xpm_type,
+        xpm_xlabel,
+        xpm_ylabel,
+        xpm_width,
+        xpm_height,
+        xpm_color_num,
+        xpm_char_per_pixel,
+        chars,
+        colors,
+        notes,
+        colors_rgb,
+        xpm_xaxis,
+        xpm_yaxis,
+        xpm_data,
+    ) = readxpm(xpm)
 
-        xpm_yaxis.reverse()
+    xpm_yaxis.reverse()
 
-        ## write gnuplot scripts
-        gpl_lines = "set term png\n"
-        gpl_lines += """set output "{}.png" \n""".format(xpm.split(".")[0])
-        gpl_lines += "unset colorbox\n"
-        pal_line = "set pal defined("
-        for index, color in enumerate(colors):
-            pal_line += """{} "{}",""".format(index, color)
-        pal_line = pal_line.strip(",") + ")"
-        gpl_lines += pal_line + "\n\n"
-        ## add data lines
-        gpl_lines += "$data << EOD\n"
-        for l in range(len(xpm_data)):
-            for i in range(0, xpm_width * xpm_char_per_pixel, xpm_char_per_pixel):
-                value = chars.index(xpm_data[l][i : i + xpm_char_per_pixel])
-                gpl_lines += "{:.6f} {:.6f} {:.6f}\n".format(
-                    xpm_xaxis[int(i / xpm_char_per_pixel)], xpm_yaxis[l], value
-                )
-        gpl_lines += "EOD\n\n"
-        ## add tail part of gpl file
-        gpl_lines += "#set tmargin at screen 0.95\n"
-        gpl_lines += "#set bmargin at screen 0.20\n"
-        gpl_lines += "#set rmargin at screen 0.85\n"
-        y_posi = 0.92
-        for index, note in enumerate(notes):
-            label_line = """#set label "{:10}" at screen 0.85,{:.2f} left textcolor rgb "{}"\n""".format(
-                note, y_posi, colors[index]
+    ## write gnuplot scripts
+    gpl_lines = "set term png\n"
+    gpl_lines += """set output "{}" \n""".format(outpng)
+    gpl_lines += "unset colorbox\n"
+    pal_line = "set pal defined("
+    for index, color in enumerate(colors):
+        pal_line += """{} "{}",""".format(index, color)
+    pal_line = pal_line.strip(",") + ")"
+    gpl_lines += pal_line + "\n\n"
+    ## add data lines
+    gpl_lines += "$data << EOD\n"
+    for l in range(len(xpm_data)):
+        for i in range(0, xpm_width * xpm_char_per_pixel, xpm_char_per_pixel):
+            value = chars.index(xpm_data[l][i : i + xpm_char_per_pixel])
+            gpl_lines += "{:.6f} {:.6f} {:.6f}\n".format(
+                xpm_xaxis[int(i / xpm_char_per_pixel)], xpm_yaxis[l], value
             )
-            y_posi -= 0.10
-            gpl_lines += label_line
-        gpl_lines += """set term pngcairo enhanced truecolor font "Arial,85" fontscale 1 linewidth 20 pointscale 5 size 10000,6000\n"""
-        gpl_lines += "set tics out nomirror;\n"
-        gpl_lines += "set key out reverse Left spacing 2 samplen 1/2\n"
-        gpl_lines += """set title "{}"\n""".format(xpm_title)
-        gpl_lines += """set xlabel "{}"; set ylabel "{}";\n""".format(
-            xpm_xlabel, xpm_ylabel
+    gpl_lines += "EOD\n\n"
+    ## add tail part of gpl file
+    gpl_lines += "#set tmargin at screen 0.95\n"
+    gpl_lines += "#set bmargin at screen 0.20\n"
+    gpl_lines += "#set rmargin at screen 0.85\n"
+    y_posi = 0.92
+    for index, note in enumerate(notes):
+        label_line = """#set label "{:10}" at screen 0.85,{:.2f} left textcolor rgb "{}"\n""".format(
+            note, y_posi, colors[index]
         )
-        gpl_lines += """plot [{:.2f}:{:.2f}] [{:.2f}:{:.2f}] $data u 1:2:3 w imag notit, \\\n""".format(
-            math.floor(min(xpm_xaxis) * 10.0) / 10.0 - 0.1,
-            math.ceil(max(xpm_xaxis) * 10.0) / 10.0 + 0.1,
-            math.floor(min(xpm_yaxis) * 10.0) / 10.0 - 0.1,
-            math.ceil(max(xpm_yaxis) * 10.0) / 10.0 + 0.1,
+        y_posi -= 0.10
+        gpl_lines += label_line
+    gpl_lines += """set term pngcairo enhanced truecolor font "Arial,85" fontscale 1 linewidth 20 pointscale 5 size 10000,6000\n"""
+    gpl_lines += "set tics out nomirror;\n"
+    gpl_lines += "set key out reverse Left spacing 2 samplen 1/2\n"
+    gpl_lines += """set title "{}"\n""".format(xpm_title)
+    gpl_lines += """set xlabel "{}"; set ylabel "{}";\n""".format(
+        xpm_xlabel, xpm_ylabel
+    )
+    gpl_lines += """plot [{:.2f}:{:.2f}] [{:.2f}:{:.2f}] $data u 1:2:3 w imag notit, \\\n""".format(
+        math.floor(min(xpm_xaxis) * 10.0) / 10.0 - 0.1,
+        math.ceil(max(xpm_xaxis) * 10.0) / 10.0 + 0.1,
+        math.floor(min(xpm_yaxis) * 10.0) / 10.0 - 0.1,
+        math.ceil(max(xpm_yaxis) * 10.0) / 10.0 + 0.1,
+    )
+    for index, note in enumerate(notes):
+        gpl_lines += """{} w p ps 3 pt 5 lc rgb "{}" t"{}", \\\n""".format(
+            math.floor(min(xpm_yaxis)) - 1, colors[index], note
         )
-        for index, note in enumerate(notes):
-            gpl_lines += """{} w p ps 3 pt 5 lc rgb "{}" t"{}", \\\n""".format(
-                math.floor(min(xpm_yaxis)) - 1, colors[index], note
-            )
-        gpl_lines = gpl_lines.strip("\n").strip("\\").strip().strip(",")
+    gpl_lines = gpl_lines.strip("\n").strip("\\").strip().strip(",")
 
-        ## write gpl files
-        with open(xpm.split(".")[0] + ".gpl", "w") as fo:
-            fo.write(gpl_lines + "\n")
+    ## write gpl files
+    with open(outgpl, "w") as fo:
+        fo.write(gpl_lines + "\n")
 
-        print("Info -> write gnuplot scripts from {} successfully".format(xpm))
+    print("Info -> write gnuplot scripts {} from {} successfully".format(outgpl, xpm))
 
 
 def main():
     parser = argparse.ArgumentParser(description="Process xpm files generated by GMX")
     parser.add_argument("-f", "--inputfile", help="input your xpm file")
-    parser.add_argument("-o", "--outputpng", help="picture file to output")
+    parser.add_argument("-o", "--outputfile", help="file name to output")
     parser.add_argument(
         "-ip",
         "--interpolation",
@@ -763,25 +759,23 @@ def main():
     parser.add_argument(
         "-e",
         "--extract",
-        nargs="+",
         help="specify xpm files to extract scatter data and save to csv file",
     )
     parser.add_argument(
         "-g",
         "--gnuplot",
-        nargs="+",
         help="specify xpm files to convert into gnuplot scripts (.gpl file)",
     )
     args = parser.parse_args()
 
     inputxpm = args.inputfile
-    outputpng = args.outputpng
+    output = args.outputfile
     ip = args.interpolation
     noshow = args.noshow
     xpms2combine = args.combine
     pcm = args.pcolormesh
-    extract_files = args.extract
-    gnuplot_files = args.gnuplot
+    extract_file = args.extract
+    gnuplot_file = args.gnuplot
     fig_3d = args.threeDimensions
 
     ## check parameters and call different functions
@@ -790,21 +784,21 @@ def main():
         exit()
 
     if xpms2combine != None:
-        combinexpm(xpms2combine, outputpng, noshow)
+        combinexpm(xpms2combine, output, noshow)
 
     if inputxpm != None:
         if fig_3d == True:
-            drawxpm_3D(inputxpm, ip, outputpng, noshow)
+            drawxpm_3D(inputxpm, ip, output, noshow)
         if pcm == False and fig_3d == False:
-            drawxpm_origin(inputxpm, ip, outputpng, noshow)
+            drawxpm_origin(inputxpm, ip, output, noshow)
         elif pcm == True and fig_3d == False:
-            drawxpm_newIP(inputxpm, ip, outputpng, noshow)
+            drawxpm_newIP(inputxpm, ip, output, noshow)
 
-    if extract_files != None:
-        extract_scatter(extract_files)
+    if extract_file != None:
+        extract_scatter(extract_file, output)
 
-    if gnuplot_files != None:
-        xpm2gpl(gnuplot_files)
+    if gnuplot_file != None:
+        xpm2gpl(gnuplot_file, output)
 
     print("Good Day !")
 
