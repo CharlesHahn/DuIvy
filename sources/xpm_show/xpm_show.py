@@ -45,7 +45,7 @@ def readxpm(inputfile: str) -> tuple:
 
     ## check and read xpm file
     if not os.path.exists(inputfile):
-        print("ERROR -> no {} in current directory")
+        print("ERROR -> no {} in current directory".format(inputfile))
         exit()
     with open(inputfile, "r") as fo:
         lines = [line.strip() for line in fo.readlines()]
